@@ -4,3 +4,5 @@
 *.glob
 .*.aux
 .lia.cache
+__pycache__/
+.nia.cache
