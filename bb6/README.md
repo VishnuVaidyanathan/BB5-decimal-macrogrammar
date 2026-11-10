@@ -31,15 +31,18 @@ of ones after the marker `10` (so `q = m + 3a` in mxdys' numbers).
 | `init` | blank tape → S1(3, 7, 2, 6, 63) | `27,965` |
 | `first_epoch` | end of the first epoch | `27,965 + 332 + T 63 0` |
 | `runF_ok`, `runTop_ok` | any number of epochs in a row | given by the functions `runF`, `runTop` |
+| `halt_ones` | ones on the tape after the halt | `len0 + a + 3b + 16` ones |
 | **`bb6_halts_exactly`** | **the machine halts after exactly `halting_time` steps, and not before** | |
+| **`bb6_final_ones`** | **the final tape holds exactly `final_ones` ones** | |
 
-`halting_time` is a closed Coq term built from the formulas above. It follows
+`halting_time` and `final_ones` are closed Coq terms built from the formulas
+above (`final_ones = len0 + a + 3b + 16` at the last shape). They follow
 the three passes of mxdys' proof (7 epochs, restart, second pass, restart,
 third pass, halt). The remainders that decide "restart or halt" are proved
 again here, in this model (`runF_inv`, `runTop_inv`).
 
-The number itself cannot be written out: it has far too many digits. The
-theorem fixes which number it is.
+The numbers themselves cannot be written out: they have far too many digits.
+The theorems fix which numbers they are.
 
 The first epoch ends at step
 
@@ -60,5 +63,4 @@ The first epoch ends at step
 
   and the proof follows exactly these words, but the digit strings are not
   stated as theorems.
-- The number of ones on the final tape (tested: `len0 + a + 3b + 16`).
 - A link to mxdys' Coq development. The two proofs use different tape models.

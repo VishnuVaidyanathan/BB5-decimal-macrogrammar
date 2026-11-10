@@ -510,6 +510,63 @@ Proof.
   cbn [steps step act app repeat u100]. reflexivity.
 Qed.
 
+(* The same, with the tape written out. *)
+Lemma last_move_cfg : forall L a b,
+  steps (12 * L + 12 * a + 59) (S1c (repeat false L) (3 * a) b)
+  = (B, true :: true :: false :: u100 (S a) ++ true :: true :: true :: u100 (S L)
+        ++ [true; true; true; false; true; true; true],
+     true, ones (3 * b + 2)).
+Proof.
+  intros L a b.
+  replace (12 * L + 12 * a + 59)
+    with ((3 * (3 * a) + 12 * L + 53) + (3 * S a + 3)) by lia.
+  by_lemma turn.
+  replace (3 * b + 3) with (S (3 * b + 2)) by lia.
+  shape (C, true :: true :: true :: u100 (S L) ++ [true; true; true; false; true; true; true], true,
+         ones (3 * a + 2) ++ true :: false :: false :: ones (S (3 * b + 2))).
+  2: { replace (3 * a + 3) with ((3 * a + 2) + 1) by lia.
+       rewrite (ones_add (3 * a + 2) 1). reflexivity. }
+  by_lemma flip.
+  cbn [steps step act app repeat u100]. reflexivity.
+Qed.
+
+(* Number of ones on the tape. *)
+Fixpoint cnt (l : list bool) : nat :=
+  match l with
+  | [] => 0
+  | true :: t => S (cnt t)
+  | false :: t => cnt t
+  end.
+
+Definition tape_ones (c : conf) : nat :=
+  let '(_, l, h, r) := c in cnt l + (if h then 1 else 0) + cnt r.
+
+Definition state (c : conf) : St := let '(s, _, _, _) := c in s.
+
+Lemma cnt_app : forall x y, cnt (x ++ y) = cnt x + cnt y.
+Proof. induction x as [| [|] x IH]; intros y; simpl; rewrite ?IH; reflexivity. Qed.
+
+Lemma cnt_ones : forall n, cnt (ones n) = n.
+Proof. induction n; simpl; [reflexivity | rewrite IHn; reflexivity]. Qed.
+
+Lemma cnt_u100 : forall n, cnt (u100 n) = n.
+Proof. induction n; simpl; [reflexivity | rewrite IHn; reflexivity]. Qed.
+
+(* One step later the machine has halted, with len0 + a + 3b + 16 ones. *)
+Theorem halt_ones : forall L a b,
+  state (steps (12 * L + 12 * a + 60) (S1c (repeat false L) (3 * a) b)) = Z /\
+  tape_ones (steps (12 * L + 12 * a + 60) (S1c (repeat false L) (3 * a) b))
+  = L + a + 3 * b + 16.
+Proof.
+  intros L a b.
+  replace (12 * L + 12 * a + 60) with ((12 * L + 12 * a + 59) + 1) by lia.
+  rewrite steps_add, last_move_cfg.
+  replace (3 * b + 2) with (S (3 * b + 1)) by lia.
+  cbn [steps step act repeat state tape_ones]. split; [reflexivity |].
+  cbn [cnt u100 app]. rewrite !cnt_app, !cnt_u100, cnt_ones. cbn [cnt].
+  rewrite cnt_app, cnt_u100. cbn [cnt]. lia.
+Qed.
+
 (* ---------- 9. From the blank tape ---------- *)
 
 Definition c0 : conf := (A, [], false, []).
@@ -676,9 +733,10 @@ Lemma last_move' : forall L a b q, q = 3 * a -> exists l r,
   steps (12 * L + 12 * a + 59) (S1c (repeat false L) q b) = (B, l, true, r).
 Proof. intros; subst; apply last_move. Qed.
 
-(* The number of steps before the last one.  It follows mxdys' proof:
-   7 epochs, restart, a second pass, restart, a third pass, halt. *)
-Definition pre_halt : nat :=
+(* The run up to the last tidy shape.  It follows mxdys' proof: 7 epochs,
+   restart, a second pass, restart, a third pass.  Returns the number of
+   steps used and the numbers (len0, a, b) of that last shape. *)
+Definition final_params : nat * nat * nat * nat :=
   let '(c1, q1, b1) := runF 3 20 63 in
   let a1 := q1 / 3 in
   let r1 := 12 * 3 + 12 * a1 + 3 * b1 + 97 + T b1 0 in
@@ -689,15 +747,26 @@ Definition pre_halt : nat :=
   let r2 := 12 * L2 + 12 * a2 + 3 * e2 + 97 + T e2 0 in
   let '(c3, q3, b3) := runF a2 (3 * e2 + 2) (Nk e2) in
   let '(d3, p3, e3) := runTop (S L2) (S a2) q3 b3 in
-  let a3 := p3 / 3 in
-  let L3 := S a2 + S L2 in
-  (821 + T 6 0) + (c1 + (r1 + (c2 + (d2 + (r2 + (c3 + (d3 + (12 * L3 + 12 * a3 + 59)))))))).
+  ((821 + T 6 0) + (c1 + (r1 + (c2 + (d2 + (r2 + (c3 + d3)))))),
+   S a2 + S L2, p3 / 3, e3).
+
+(* Steps before the last one, the halting time, and the final ones. *)
+Definition f_steps : nat := fst (fst (fst final_params)).
+Definition f_len0  : nat := snd (fst (fst final_params)).
+Definition f_a     : nat := snd (fst final_params).
+Definition f_b     : nat := snd final_params.
+
+Definition pre_halt : nat := f_steps + (12 * f_len0 + 12 * f_a + 59).
 
 Definition halting_time : nat := S pre_halt.
 
-Theorem bb6_last_step : exists l r, steps pre_halt c0 = (B, l, true, r).
+Definition final_ones : nat := f_len0 + f_a + 3 * f_b + 16.
+
+Theorem bb6_reach : exists t0 L a e,
+  final_params = (t0, L, a, e) /\
+  steps t0 c0 = S1c (repeat false L) (3 * a) e.
 Proof.
-  unfold pre_halt.
+  unfold final_params.
   (* pass 1 *)
   destruct (runF 3 20 63) as [[c1 q1] b1] eqn:E1.
   destruct (runF_inv 3 20 63 31 _ _ _ eq_refl E1) as [[u1 Hb1] [t1 Hq1]].
@@ -748,8 +817,8 @@ Proof.
     subst a3. rewrite Hq. apply div3. lia. }
   assert (Hp3' : p3 = 3 * a3) by lia.
   (* now walk through the run *)
-  destruct (last_move' (S a2 + S (S a1 + 4)) a3 e3 p3 Hp3') as [l [r Hlast]].
-  exists l, r.
+  eexists. exists (S a2 + S (S a1 + 4)), a3, e3. split; [reflexivity |].
+  rewrite <- Hp3'.
   eapply run. { apply init. }
   eapply run. { apply (runF_ok 3 20 63 [] _ _ _ E1). }
   eapply run. { apply (restart' 3 a1 b1 q1 Hq1'). }
@@ -759,13 +828,18 @@ Proof.
   eapply run. { apply (restart' _ a2 e2 p2 Hp2'). }
   eapply run. { apply (runF_ok _ _ _ (false :: repeat true (S (S a1 + 4))) _ _ _ E3). }
   rewrite <- rep_snoc.
-  eapply run. { apply (runTop_ok0 (S (S a1 + 4)) (S a2) q3 b3 _ _ _ F3). }
-  exact Hlast.
+  exact (runTop_ok0 (S (S a1 + 4)) (S a2) q3 b3 _ _ _ F3).
+Qed.
+
+Theorem bb6_last_step : exists l r, steps pre_halt c0 = (B, l, true, r).
+Proof.
+  destruct bb6_reach as (t0 & L & a & e & Hf & Hs).
+  unfold pre_halt, f_steps, f_len0, f_a. rewrite Hf. cbn [fst snd].
+  destruct (last_move L a e) as [l [r H]]. exists l, r.
+  eapply run; [exact Hs | exact H].
 Qed.
 
 (* ---------- 13. It is the exact halting time ---------- *)
-
-Definition state (c : conf) : St := let '(s, _, _, _) := c in s.
 
 Lemma Z_stays : forall n c, state c = Z -> state (steps n c) = Z.
 Proof.
@@ -795,7 +869,18 @@ Proof.
   exact (exact_from_last pre_halt c0 l r H).
 Qed.
 
+(* The number of ones on the final tape. *)
+Theorem bb6_final_ones : tape_ones (steps halting_time c0) = final_ones.
+Proof.
+  destruct bb6_reach as (t0 & L & a & e & Hf & Hs).
+  unfold halting_time, pre_halt, final_ones, f_steps, f_len0, f_a, f_b.
+  rewrite Hf. cbn [fst snd].
+  replace (S (t0 + (12 * L + 12 * a + 59))) with (t0 + (12 * L + 12 * a + 60)) by lia.
+  rewrite steps_add, Hs. apply halt_ones.
+Qed.
+
 (* All of the above is closed under the global context (no axioms). *)
+Print Assumptions bb6_final_ones.
 Print Assumptions bb6_halts_exactly.
 Print Assumptions first_epoch.
 Print Assumptions T_closed.
