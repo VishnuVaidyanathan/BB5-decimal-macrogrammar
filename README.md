@@ -41,3 +41,9 @@ M(n+1) = ⌊(K+2)/3⌋ + 1, and halting after 15 layers.
 
 Layer grammar formally proved in Coq.
 Still to formalize: the exact step count and ones count.
+
+## BB(6)
+
+The same transcript method applied to the BB(6) champion gives exact step
+counts for every move of the machine, proved in Coq. See [`bb6/`](bb6/).
+The tape rules there are the work of mxdys; this repo adds the step counts.
