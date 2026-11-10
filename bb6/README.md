@@ -4,6 +4,15 @@ Machine (found by mxdys, June 2025; runs for more than 2↑↑↑5 steps):
 
     1RB1RA_1RC1RZ_1LD0RF_1RA0LE_0LD1RC_1RA0RE
 
+## Paper
+
+[`bb6_exact_steps.pdf`](bb6_exact_steps.pdf) (LaTeX source: `bb6_exact_steps.tex`).
+
+In short: the halting time is about two thirds of the square of the number of
+ones. The last epoch alone costs `6b² + 54b` steps (minus a tiny term), where
+`b` is the right-block number at the last shape, and the final tape has about
+`3b` ones.
+
 ## Credit
 
 The tape shapes and the rules "this shape reaches that shape" are the work of

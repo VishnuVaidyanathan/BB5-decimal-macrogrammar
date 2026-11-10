@@ -1,0 +1,474 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\st}[1]{\mathrm{#1}}
+\newcommand{\w}[1]{\mathtt{#1}}
+\newcommand{\inftyl}{0^{\infty}}
+\newcommand{\coq}[1]{\texttt{#1}}
+\newcommand{\up}{\uparrow}
+
+\title{Exact Step Counts and an Exact Halting Time\\ for the BB(6) Champion, Proved in Coq}
+\author{Vishnu Vaidyanathan\\
+\small \texttt{vishnu@edgi.in}\\
+\small ORCID 0009-0001-6244-5262\\
+\small \url{https://github.com/VishnuVaidyanathan/BB5-decimal-macrogrammar}}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The current 6-state Busy Beaver champion, found by mxdys in 2025, runs for more
+than $2\up\up\up 5$ steps. mxdys proved in Coq that it halts, using a small set
+of rules of the form ``this tape shape reaches that tape shape''. Those rules
+carry no step counts, and the halting time is known only as an estimate of its
+size. We add the missing step counts. For every move of the machine (the tick
+of its binary counter, a full countdown, the start of an epoch, the restart,
+and the final move) we give the exact number of steps as a short formula, valid
+for all values of the parameters. From these we build an exact expression for
+the halting time and for the number of ones on the final tape. We prove in Coq,
+with no axioms, that the machine started on the blank tape halts after exactly
+that many steps and not before, and that the final tape holds exactly that many
+ones. The numbers cannot be written out, but the theorems fix which numbers they
+are. The halting time is close to two thirds of the square of the number of ones. The moves were first found by reading the transcript of the machine, the
+method of our earlier paper on the BB(5) champion.
+\end{abstract}
+
+\section{Introduction}
+
+The machine studied here is
+\[
+\texttt{1RB1RA\_1RC1RZ\_1LD0RF\_1RA0LE\_0LD1RC\_1RA0RE},
+\]
+found by mxdys in June 2025. It is the current BB(6) champion: it halts, and
+its running time and its number of ones lie between $2\up\up 2\up\up 2\up\up 10$
+and $2\up\up 2\up\up 2\up\up 11$, which is more than $2\up\up\up 5$
+\cite{wiki}. The proof that it halts is a Coq development by mxdys \cite{mxdys}.
+That proof describes the tape by a few numbers and shows how these numbers
+change. Every statement in it has the form $c \to^{*} c'$: the configuration
+$c$ reaches $c'$ after \emph{some} number of steps. The number of steps is never
+stated, and so the proof does not say when the machine halts.
+
+This paper supplies the step counts.
+
+\paragraph{What is not new.} The tape shapes, the rules that take one shape to
+the next, the fact that the machine counts in binary, the size of the running
+time and the proof of halting are all the work of mxdys \cite{mxdys,wiki}. We
+found the same moves independently by reading the transcript of the machine,
+but they are the same moves.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+\item An exact step count for each move of the machine, for all values of its
+parameters (Theorems \ref{thm:tick}--\ref{thm:halt}). Each is a linear formula,
+except the full countdown, which is a quadratic in $2^{b}$.
+\item An exact expression for the halting time, and a Coq proof that the
+machine halts after exactly that many steps and at no earlier step
+(Theorem~\ref{thm:main}).
+\item An exact expression for the number of ones on the final tape, also proved
+in Coq (Theorem~\ref{thm:ones}).
+\item The transcript words of each move (Section~\ref{sec:words}). These are
+tested against simulation but are not yet stated in Coq.
+\end{enumerate}
+The Coq file is self-contained (about 890 lines, Coq 8.18, no axioms). It does
+not import the development of mxdys; it proves the moves again in its own small
+model, now with step counts.
+
+\section{Preliminaries}
+
+\paragraph{The machine.} The transition table is
+
+\begin{center}
+\begin{tabular}{lcccccc}
+\toprule
+ & A & B & C & D & E & F\\
+\midrule
+read 0 & 1RB & 1RC & 1LD & 1RA & 0LD & 1RA\\
+read 1 & 1RA & 1RZ & 0RF & 0LE & 1RC & 0RE\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The machine starts in state A on a blank tape. The only halting pair
+is B reading 1. We count the halting transition as a step, as in \cite{bb5}.
+
+\paragraph{Configurations.} We write $\inftyl\, u\, [\st{s}\ x]\, v\, \inftyl$ for
+the tape $u\,x\,v$ surrounded by blanks, with the head in state $\st{s}$ on the
+cell holding $x$. Powers denote repetition.
+
+\paragraph{Transcripts.} The transcript of a run is the list of state--symbol
+pairs it visits \cite{bbchallenge}. The machine has twelve pairs, so we write
+each as one character,
+$d(\st{s},x)=2\cdot\mathrm{idx}(\st{s})+x$, with the values ten and eleven written
+$\w{a}$ and $\w{b}$:
+$\st{A}0=\w0$, $\st{A}1=\w1$, \dots, $\st{E}1=\w9$, $\st{F}0=\w{a}$, $\st{F}1=\w{b}$.
+The halting pair $\st{B}1$ is the digit $\w3$.
+
+\paragraph{Three basic words.} Almost every step of the run belongs to one of
+three repeated words.
+\begin{itemize}
+\item $\w1$ ($\st{A}1$): the head walks right over a one.
+\item $\w{479}$ ($\st{C}0,\st{D}1,\st{E}1$): a $0$ under the head moves one cell
+to the left through a block of ones:
+$\ 1\,1\,[\st{C}\ 0] \to 1\,[\st{C}\ 0]\,1$.
+\item $\w{5b9}$ ($\st{C}1,\st{F}1,\st{E}1$): the block $111$ becomes $001$ and the
+head moves three cells to the right.
+\end{itemize}
+
+\section{Tape shapes}\label{sec:shapes}
+
+The shapes below are those of mxdys \cite{mxdys}, written for this machine.
+
+\paragraph{Counters.} A counter is a number written in binary, high bit first,
+with the bit $1$ written as the block $100$ and the bit $0$ written as the
+block $111$. Counters count down.
+
+\paragraph{The inner shape $S_0$.} A counter with any tape $X$ to its left, the
+head in state E on the last cell of the counter, and to the right the block
+\[
+R(b) \;=\; 0\ 11100\ (111)^{1+b}\ \inftyl .
+\]
+
+\paragraph{The outer shape $S_1$.} The whole tape at the start of an epoch is
+\[
+S_1(\beta, q, b) \;=\; \inftyl\ 1110\,11\ \ \beta\ \ 100\ \ 10\ \ 1^{q-1}\,[\st{E}\ 1]\ \ R(b),
+\]
+where $\beta$ is a counter, called the \emph{outer counter}, and $q$ is the
+number of ones after the marker $10$. (For $q=0$ the head is on the $0$ of the
+marker.) In the numbers of mxdys, $S_1(\mathit{len}_0,a_0,m,a,0,b)$, the outer
+counter has $\mathit{len}_0$ bits and value $a_0$, and
+\[
+q = m + 3a, \qquad m\in\{0,1,2\}.
+\]
+So one number $q$ carries both the marker $m = q \bmod 3$ and the length $a$ of
+the inner counter, which is all zeros at the start of an epoch. This makes the
+rules shorter.
+
+Throughout, $N_k = 2^{k}-1$.
+
+\section{The tick}
+
+\begin{theorem}[Tick; \coq{tick}]\label{thm:tick}
+Let a counter end in a bit $1$ followed by $j \ge 0$ bits $0$. From the shape
+$S_0$ with this counter and right block $R(b)$, the machine reaches the shape
+$S_0$ in which that bit $1$ has become $0$, the $j$ bits after it have become
+$1$, and the right block is $R(b+1)$. It takes exactly
+\[
+12b + 12j + 48 \quad \text{steps.}
+\]
+\end{theorem}
+
+In other words the counter goes down by one, the right block gains one $111$,
+and $j$ is the length of the borrow. This is the lemma \coq{Inc0} of
+\cite{mxdys}, with the step count added.
+
+\begin{theorem}[Countdown; \coq{full\_ticks}, \coq{T\_closed}]\label{thm:count}
+Let the lowest $k$ bits of a counter all be $1$. From $S_0$ with right block
+$R(b)$ the machine reaches $S_0$ with those $k$ bits all $0$ and right block
+$R(b+N_k)$, in exactly $T(k,b)$ steps, where
+\[
+T(k,b) \;=\; 6N_k^{2} + 54N_k + 12\,b\,N_k - 12k .
+\]
+\end{theorem}
+
+\begin{proof}[Idea of the proof]
+To clear $k+1$ bits, clear the low $k$ bits, do one tick with borrow $k$, and
+clear the low $k$ bits again. This gives the recursion
+$T(k+1,b) = T(k,b) + \bigl(12(b+N_k)+12k+48\bigr) + T(k,\,b+N_k+1)$ with
+$T(0,b)=0$, and the closed form follows by induction on $k$. No sum over the
+borrow lengths is needed.
+\end{proof}
+
+\section{The epoch}
+
+An epoch starts at a shape $S_1$ whose outer counter is not zero.
+
+\begin{theorem}[Epoch; \coq{load}, \coq{epoch}]\label{thm:epoch}
+Let the outer counter $\beta$ end in a bit $1$ followed by $j_0\ge 0$ bits $0$,
+and let $\beta'$ be $\beta$ minus one. Then
+\[
+S_1(\beta, q, b) \;\longrightarrow\; S_1\bigl(\beta',\ q+3b+5,\ 2^{b}-1\bigr)
+\]
+in exactly
+\[
+\underbrace{4q + 12j_0 + 3b + 63}_{\text{load}} \;+\; \underbrace{T(b,0)}_{2^{b}-1\ \text{ticks}}
+\quad\text{steps, where } T(b,0) = 6N_b^{2}+54N_b-12b .
+\]
+\end{theorem}
+
+The load moves the right block $(111)^{1+b}$ into a new inner counter as the
+value $2^{b}-1$, and takes one off the outer counter. The ticks then count the
+inner counter down to zero, which builds a right block of $2^{b}-1$ units.
+These are the lemmas \coq{Rst2}, \coq{Rst1}, \coq{Rst0} of \cite{mxdys} (called
+Inc2, Inc1, Inc0 on the wiki \cite{wiki}). In their numbers the load costs
+$12a + 3b + 12j_0 + 63 + 4m$ steps. Since $q$ grows by $3b+5$, the marker
+$m = q \bmod 3$ goes $2 \to 1 \to 0 \to 2$ from one epoch to the next.
+
+\section{Restart and halt}
+
+When the outer counter is zero, the head runs to the left end of the tape. What
+happens next depends on $q \bmod 3$.
+
+\begin{theorem}[Restart; \coq{restart}]\label{thm:restart}
+Let the outer counter be $L$ zero bits and let $q = 3a+1$. Then
+\[
+S_1(0^{L},\ 3a+1,\ b) \;\longrightarrow\; S_1\bigl(\beta^{*},\ 3b+2,\ 2^{b}-1\bigr)
+\]
+in exactly $12L + 12a + 3b + 97 + T(b,0)$ steps, where the new outer counter
+$\beta^{*}$ has $L+a+2$ bits: $L+1$ ones, then a zero, then $a$ ones. Its value
+is $2^{L+a+2} - 2^{a} - 1$.
+\end{theorem}
+
+\begin{theorem}[Halt; \coq{last\_move\_cfg}, \coq{halt\_ones}]\label{thm:halt}
+Let the outer counter be $L$ zero bits and let $q = 3a$. From $S_1(0^{L}, 3a, b)$
+the machine halts after exactly
+\[
+12L + 12a + 60 \quad\text{steps,}
+\]
+and the final tape holds exactly $L + a + 3b + 16$ ones.
+\end{theorem}
+
+The count of ones can be read off the final tape: $6$ in the left end
+$1110111$, $L+4$ in what was the outer counter, $a+1$ in the middle block, $2$
+written just before the halt, and $3b+3$ in the right block, which is not
+touched.
+
+\section{The whole run}
+
+\begin{proposition}[\coq{init}]\label{prop:init}
+From the blank tape the machine reaches $S_1(111,\ 20,\ 63)$ after exactly
+$27{,}965$ steps. In the numbers of mxdys this is $S_1(3,7,2,6,0,63)$.
+\end{proposition}
+
+By Theorem~\ref{thm:epoch} the first epoch then takes
+$332 + T(63,0)$ steps. It ends at step
+\[
+510{,}423{,}550{,}381{,}407{,}695{,}582{,}443{,}536{,}695{,}552{,}928{,}613
+\approx 5.1\times 10^{38}
+\]
+(\coq{first\_epoch}). The second epoch has $2^{2^{63}-1}-1$ ticks, so no later
+step number can be written out.
+
+\paragraph{Many epochs.} Between restarts only two numbers change, $q$ and $b$,
+together with the outer counter. One epoch is the map
+$(q,b)\mapsto(q+3b+5,\ 2^{b}-1)$ with the cost of Theorem~\ref{thm:epoch}. The
+Coq file defines two functions that add up the costs of a long run of epochs by
+recursion on the shape of the outer counter, in the same way as the proof of
+Theorem~\ref{thm:count}: \coq{runF}~$k$ clears $k$ low bits that are all $1$
+($2^{k}-1$ epochs), and \coq{runTop}~$n$~$z$ clears $n$ ones that sit above $z$
+zeros. The theorems \coq{runF\_ok} and \coq{runTop\_ok} say that the machine
+follows these functions exactly.
+
+\paragraph{Restart or halt.} Two simple facts decide the whole run
+(\coq{runF\_inv}, \coq{runTop\_inv}): $b$ is always odd, and therefore each
+epoch adds $2$ to $q$ modulo $6$. Together with $N_k \equiv 0$ or $1 \pmod 3$
+for $k$ even or odd, this gives the three passes found by mxdys:
+\begin{center}
+\begin{tabular}{clll}
+\toprule
+Pass & Outer counter at the start & Epochs mod 3 & $q$ at the end\\
+\midrule
+1 & $111$ (value 7) & $1$ & $6t+4 = 3a_1+1$, $a_1$ odd: restart\\
+2 & $2^{a_1+5}-2^{a_1}-1$ & $1$ & $6t+7 = 3a_2+1$, $a_2$ even: restart\\
+3 & $2^{a_1+a_2+7}-2^{a_2}-1$ & $2$ & $6t+9 = 3a_3$: halt\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{theorem}[Exact halting time; \coq{bb6\_halts\_exactly}]\label{thm:main}
+Let $H$ be the sum of: $27{,}965$; the costs of the $7$ epochs of pass~1; the
+first restart; the costs of all epochs of pass~2; the second restart; the costs
+of all epochs of pass~3; and the final move $12L_3+12a_3+60$, where
+$L_3 = a_1+a_2+7$. Then the machine, started on the blank tape, is halted after
+$H$ steps and is not halted after any smaller number of steps.
+\end{theorem}
+
+In Coq, $H$ is the closed term \coq{halting\_time}, built from \coq{runF},
+\coq{runTop}, $T$ and the formulas of Theorems
+\ref{thm:epoch}--\ref{thm:halt}. Coq never evaluates it.
+
+\begin{theorem}[Final ones; \coq{bb6\_final\_ones}]\label{thm:ones}
+The final tape holds exactly $L_3 + a_3 + 3b_3 + 16$ ones, where $b_3$ is the
+value of $b$ at the last shape.
+\end{theorem}
+
+Since $b_3$ is far larger than $L_3$ and $a_3$, the number of ones is very
+nearly $3b_3$. This agrees in size with the estimates on the wiki \cite{wiki}.
+
+\paragraph{Runtime against ones.} Let $b'$ be the value of $b$ at the start of
+the last epoch, so that $b_3 = 2^{b'}-1$. By Theorem~\ref{thm:epoch} the ticks
+of that one epoch take $6b_3^{2}+54b_3-12b'$ steps. So, writing $\sigma$ for the
+number of ones,
+\[
+H \;=\; 6b_3^{2} + 54b_3 + R, \qquad \sigma \;=\; 3b_3 + r, \qquad r = L_3+a_3+16,
+\]
+where $R$ collects every other step of the run. Both $R$ and $r$ are tiny
+beside $b_3$: each earlier epoch is smaller than the next by a whole
+exponential, so all of them together cost about $(\log b_3)^{2}$ steps, and
+$L_3$ and $a_3$ are about $\log b_3$ or less. Hence
+\[
+H \;\approx\; \tfrac{2}{3}\,\sigma^{2} .
+\]
+The two displayed identities follow from the theorems above. The size of $R$
+and $r$ is a pen-and-paper estimate and is not stated in Coq. As a small test,
+a starting shape whose run ends with $b=127$ gives $H/\sigma^{2}=0.61$ and
+$R = 1044$. A running time of the order of $\sigma^{2}$ is what one expects of
+a machine that sweeps back and forth over its tape.
+
+\section{Transcript words}\label{sec:words}
+
+The moves above were first seen in the transcript. Write $\Omega=\w{479}$ and
+$\Lambda=\w{5b9}$. The transcript of each move is one word with a few counts:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.74\textwidth}@{}}
+\toprule
+Move & Word\\
+\midrule
+Tick, $j\ge1$ &
+$\w9\,\Omega^{3j-1}\,\w{478602}\,\Lambda^{j+1}\,\w{4786025a}\,\w1^{3b+3}\,\w{02}\,\Omega^{3b+5}\,\w{47879}\,\Omega^{2}\,\w{47}$\\
+Tick, $j=0$ &
+$\w{8602}\,\Lambda\,\w{4786025a}\,\w1^{3b+3}\,\w{02}\,\Omega^{3b+5}\,\w{47879}\,\Omega^{2}\,\w{47}$\\
+Load &
+$\w9\,\Omega^{q-1}\,\w{47878602}\,\Omega^{3j_0+3}\,\w{478602}\,\Lambda^{j_0+1}\,\w{5a}\,\w1^{q+3}\,\w{02}\,\Lambda^{b+1}\,\Phi$\\
+Restart &
+$\w9\,\Omega^{q-1}\,\w{47878602}\,\Pi\,\Lambda^{a+1}\,\w{5b8602}\,\Lambda^{b+1}\,\Phi$\\
+Halt &
+$\w9\,\Omega^{q-1}\,\w{47878602}\,\Pi\,\Lambda^{a+1}\,\w{5a03}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Here
+\begin{align*}
+\Phi &= \w{4786025a02}\,\Omega^{2}\,\w{47879}\,\Omega^{2}\,\w{47},\\
+\Pi &= \Omega^{3L+5}\,\w{47879}\,\Omega\,\w{4786025b8602}\,\Lambda^{L+2}\,\w{478602}.
+\end{align*}
+The word $\Phi$ closes the load and the restart, and $\Pi$
+is the turn at the left end of the tape, and for $q=0$ the opening
+$\w9\,\Omega^{q-1}\,\w{47878602}$ is replaced by $\w{878602}$. The lengths of
+these words are the step counts of the theorems. The halt word ends in $\w3$,
+the only occurrence of the halting pair in the whole run.
+
+The words were checked against direct simulation on $228$ cases with small
+parameters. The Coq proofs follow exactly these words, one lemma for each
+repeated word and a computation for each fixed piece, but the digit strings are
+not yet stated as theorems.
+
+\begin{remark}
+In the first $30{,}000{,}000$ steps from the blank tape, the digit $\w{a}$ cuts
+the transcript into $2{,}305$ pieces. Of these, $2{,}299$ are exactly one tick word each (cut at a different point
+of the word), with the counts given above. The other six lie in the first
+$800$ steps and around the first load. This is how the tick was found, before
+the proof of mxdys was read.
+\end{remark}
+
+\section{The Coq proof}
+
+The development is the file \texttt{bb6/BB6Steps.v} in the repository (about
+890 lines, Coq 8.18). \texttt{Print Assumptions} reports that
+\coq{bb6\_halts\_exactly}, \coq{bb6\_final\_ones}, \coq{first\_epoch} and
+\coq{T\_closed} are closed under the global context: no axioms are used.
+
+\paragraph{Model.} As in \cite{bb5}, a configuration is a state, the list of
+cells to the left of the head (nearest first), the cell under the head, and the
+list of cells to the right. An empty list stands for blanks. \coq{steps n c}
+applies the transition table $n$ times.
+
+\paragraph{Structure.} Three lemmas handle the repeated words $\w1$, $\w{479}$
+and $\w{5b9}$ for any number of repeats, by induction. Each move is then a
+chain of these lemmas and of short fixed computations, with the step counts
+added along the chain. Counters are lists of bits, so that a countdown is an
+induction on the list. The numbers $a_1,a_2,a_3$ are tower-sized, but they only
+ever appear as variables.
+
+\paragraph{The model is the right machine.} The start of the run is checked by
+computation inside Coq: $821$ steps from the blank tape give a shape $S_0$, and
+Theorem~\ref{thm:count} then gives Proposition~\ref{prop:init}.
+
+\paragraph{Independent test.} A Python script in the repository,
+\texttt{check\_steps.py}, starts the machine from $132$ small shapes $S_1$ that
+halt, and predicts the halting step and the final ones using only the formulas
+of this paper and the rules of mxdys. All $132$ agree with plain simulation.
+
+\paragraph{What is not in Coq.} The transcript words of
+Section~\ref{sec:words}. Also, this proof and that of mxdys use different tape
+models and are not linked to each other; they agree on the shapes and on the
+three passes.
+
+\section{Discussion}
+
+\paragraph{What kind of result this is.} Nothing here changes what is known
+about the behaviour of the machine. The result is exact bookkeeping on top of a
+known structure: the proof of halting said that the machine stops, and this
+paper says after how many steps, as a definite expression. We do not know of an
+earlier exact expression for the halting time of this machine, but one may
+exist in unpublished notes or code of the bbchallenge community.
+
+\paragraph{The step counts are simple.} Every move costs a linear number of
+steps in its parameters, and a countdown costs a quadratic in $2^{b}$. The
+enormous running time comes only from the rule $b \mapsto 2^{b}-1$, applied
+once per epoch.
+
+\paragraph{Transcripts as a way to find rules.} In \cite{bb5} the transcript of
+the BB(5) champion was described by a grammar of repeated words with growing
+counts. The same reading of the BB(6) champion's transcript gave the tick, its
+two counts and its cost before any tape analysis was used. For the later moves
+this is not possible: the first epoch alone takes about $5\times10^{38}$ steps,
+so no simulation reaches a restart. There the rules of mxdys were needed to
+know where to look, and small starting shapes were used to measure the costs.
+
+\paragraph{Future work.} (1) State the transcript words in Coq. (2) Derive
+small facts about the halting time, such as its remainder modulo a small
+number. (3) Apply the same counting to the other machines covered by
+\cite{mxdys}.
+
+\section*{Acknowledgements}
+
+The tape shapes and rules used throughout are due to mxdys. A question from
+Shawn Ligocki led to the paragraph on runtime against ones. Parts of the
+analysis and of the Coq development were carried out with the help of an AI
+assistant (Claude, Anthropic); the Coq proofs are checked by the Coq kernel.
+
+\begin{thebibliography}{9}
+
+\bibitem{mxdys}
+mxdys. \emph{busycoq}, file \texttt{verify/SOBCv5.v}, module \texttt{TM62}.
+\url{https://github.com/ccz181078/busycoq}, commit \texttt{3f302b8}.
+
+\bibitem{wiki}
+BusyBeaverWiki. \emph{1RB1RA\_1RC1RZ\_1LD0RF\_1RA0LE\_0LD1RC\_1RA0RE}.
+\url{https://wiki.bbchallenge.org/wiki/1RB1RA_1RC1RZ_1LD0RF_1RA0LE_0LD1RC_1RA0RE},
+retrieved November 2026.
+
+\bibitem{bb5}
+V. Vaidyanathan. \emph{A proved transcript grammar for the BB(5) champion}.
+November 2026.
+\url{https://github.com/VishnuVaidyanathan/BB5-decimal-macrogrammar}.
+
+\bibitem{bbchallenge}
+The bbchallenge Collaboration. \emph{Determination of the fifth Busy Beaver
+value}. arXiv:2509.12337, 2025.
+
+\bibitem{rado}
+T. Rad\'o. On non-computable functions. \emph{Bell System Technical Journal},
+41(3):877--884, 1962.
+
+\end{thebibliography}
+
+\end{document}
