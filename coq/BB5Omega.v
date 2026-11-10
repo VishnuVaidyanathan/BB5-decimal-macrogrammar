@@ -811,3 +811,34 @@ Fixpoint M_list (fuel a : nat) : list nat :=
 Lemma M_sequence :
   M_list 20 2 = [1; 3; 6; 12; 22; 39; 66; 112; 189; 316; 529; 883; 1473; 2456; 4095].
 Proof. vm_compute. reflexivity. Qed.
+
+(* ---------- Link to the Buro (1990) / Michel (1993) rule ----------
+   Michel writes g(x) for state A on a block of x ones and gives
+     g(3k) -> g(5k+6),  g(3k+1) -> g(5k+9),  g(3k+2) -> halt.
+   Our layer map is the same rule under  a = x + 2.                  *)
+
+Definition michel (x : nat) : option nat :=
+  match x mod 3 with
+  | 0 => Some (5 * (x / 3) + 6)
+  | 1 => Some (5 * (x / 3) + 9)
+  | _ => None
+  end.
+
+Theorem layer_map_is_michel : forall x,
+  next_layer (x + 2) = option_map (fun y => y + 2) (michel x).
+Proof.
+  intros x. unfold next_layer, michel.
+  pose proof (Nat.div_mod x 3 ltac:(lia)) as Hx.
+  pose proof (Nat.mod_upper_bound x 3 ltac:(lia)) as Hb.
+  set (q := x / 3) in *. set (r := x mod 3) in *.
+  assert (Hq : (x + 2 + 1) / 3 = q + 1).
+  { replace (x + 2 + 1) with (r + (q + 1) * 3) by lia.
+    rewrite Nat.div_add by lia. rewrite Nat.div_small by lia. lia. }
+  assert (Hr : (x + 2 + 1) mod 3 = r).
+  { replace (x + 2 + 1) with (r + (q + 1) * 3) by lia.
+    rewrite Nat.Div0.mod_add. apply Nat.mod_small. lia. }
+  rewrite Hq, Hr.
+  destruct r as [| [| [| r']]]; simpl; try reflexivity; try lia.
+  - f_equal. lia.
+  - f_equal. lia.
+Qed.
