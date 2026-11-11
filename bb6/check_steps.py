@@ -4,7 +4,7 @@ Runs the BB(6) champion 1RB1RA_1RC1RZ_1LD0RF_1RA0LE_0LD1RC_1RA0RE by plain
 simulation and compares with the formulas.  This is a test, not a proof; the
 proof is the Coq file.
 
-Shape S1(len0, a0, m, a, b) (mxdys, busycoq SOBCv5.v, module TM62), written
+Shape S1(len0, a0, m, a, b) (mxdys, busycoq SOBCv5.v, modules TM62/TM63), written
 for this machine, left to right:
 
     1110 11  LC(len0,a0)  100  10 1^m  (111)^a  [head E on last cell]

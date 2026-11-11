@@ -133,6 +133,17 @@ head moves three cells to the right.
 
 The shapes below are those of mxdys \cite{mxdys}, written for this machine.
 
+\paragraph{Which run.} In \cite{mxdys} the transition table of the champion
+appears, with the states renamed, as two modules: \texttt{TM62}, started in the
+champion's state D, and \texttt{TM63}, started in its state B. The champion
+itself starts in state A. Its configuration after $15$ steps is the
+configuration of \texttt{TM63} after $9$ steps, and the two runs are the same
+from there on (\texttt{Eqv\_v2.TM872} in \cite{mxdys}). So \texttt{TM63} is the
+champion, six steps behind, and its halting proof is the halting proof of the
+champion. \texttt{TM62} is a different run that obeys the same rules, with a
+slightly different left end of the tape. Everything in this paper is about the
+run from state A on the blank tape.
+
 \paragraph{Counters.} A counter is a number written in binary, high bit first,
 with the bit $1$ written as the block $100$ and the bit $0$ written as the
 block $111$. Counters count down.
@@ -366,7 +377,7 @@ these words are the step counts of the theorems. The halt word ends in $\w3$,
 the only occurrence of the halting pair in the whole run.
 
 The words were checked against direct simulation on $228$ cases with small
-parameters. The Coq proofs follow exactly these words, one lemma for each
+parameters (script \texttt{check\_words.py} in the repository). The Coq proofs follow exactly these words, one lemma for each
 repeated word and a computation for each fixed piece, but the digit strings are
 not yet stated as theorems.
 
@@ -448,8 +459,9 @@ assistant (Claude, Anthropic); the Coq proofs are checked by the Coq kernel.
 \begin{thebibliography}{9}
 
 \bibitem{mxdys}
-mxdys. \emph{busycoq}, file \texttt{verify/SOBCv5.v}, module \texttt{TM62}.
-\url{https://github.com/ccz181078/busycoq}, commit \texttt{3f302b8}.
+mxdys. \emph{busycoq}, branch \texttt{BB6}: files \texttt{verify/SOBCv5.v}
+(modules \texttt{TM62}, \texttt{TM63}) and \texttt{verify/Eqv\_v2.v} (module
+\texttt{TM872}). \url{https://github.com/ccz181078/busycoq}, read November 2026.
 
 \bibitem{wiki}
 BusyBeaverWiki. \emph{1RB1RA\_1RC1RZ\_1LD0RF\_1RA0LE\_0LD1RC\_1RA0RE}.

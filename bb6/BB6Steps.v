@@ -2,8 +2,11 @@
    Exact step counts for its moves.
 
    The tape shapes and the rules "which shape reaches which shape" are due to
-   mxdys (busycoq, verify/SOBCv5.v, module TM62, where the same machine is
-   written with renamed states).  That proof has no step counts.  This file
+   mxdys (busycoq, verify/SOBCv5.v).  The same transition table appears there,
+   with renamed states, as the modules TM62 and TM63, started in this
+   machine's states D and B.  The run from state A proved here joins the run
+   of TM63 after 15 and 9 steps (busycoq Eqv_v2.TM872); TM62 is a different
+   run under the same rules.  That proof has no step counts.  This file
    proves the same moves again in a small self-contained model and adds the
    exact number of steps of each move.
 

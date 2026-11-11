@@ -16,8 +16,12 @@ ones. The last epoch alone costs `6b² + 54b` steps (minus a tiny term), where
 ## Credit
 
 The tape shapes and the rules "this shape reaches that shape" are the work of
-**mxdys** (busycoq, `verify/SOBCv5.v`, module `TM62`, where the same machine is
-written with renamed states). That proof shows the machine halts. It does not
+**mxdys** (busycoq, `verify/SOBCv5.v`). The champion's transition table appears
+there, with the states renamed, as the modules `TM62` and `TM63`, started in the
+champion's states D and B. The champion itself starts in state A. Its run joins
+the run of `TM63` after 15 and 9 steps (busycoq `Eqv_v2.TM872`), so `TM63` is the
+champion, 6 steps behind. `TM62` is a different run that follows the same rules.
+That proof shows the machine halts. It does not
 count steps.
 
 This folder adds the **exact number of steps of every move**, and from them an
@@ -61,6 +65,7 @@ The first epoch ends at step
 
     coqc BB6Steps.v        # about 5 seconds; prints "Closed under the global context"
     python3 check_steps.py # tests the formulas against plain simulation
+    python3 check_words.py # tests the transcript words and the merge with TM63
 
 ## Not in Coq yet
 
