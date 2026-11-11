@@ -1,0 +1,524 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% head marker: state s reading symbol x
+\newcommand{\hd}[2]{[\mathrm{#1}\,#2]}
+\newcommand{\Z}{0^{\infty}}
+\newcommand{\coq}[1]{\texttt{#1}}
+\newcommand{\W}{\mathcal{W}}
+
+\lstdefinelanguage{Coq}{
+  morekeywords={Theorem,Lemma,Proof,Qed,Definition,Fixpoint,Inductive,match,with,end,exists,forall,fun,let,in,Some,None},
+  sensitive=true, morecomment=[s]{(*}{*)}}
+\lstset{language=Coq,basicstyle=\small\ttfamily,keywordstyle=\bfseries,
+  columns=fullflexible,frame=single,framerule=0.3pt,xleftmargin=1em,xrightmargin=1em}
+
+\title{A Proved Transcript Grammar for the BB(5) Champion}
+\author{Vishnu Vaidyanathan\\
+\small \texttt{vishnu@edgi.in}\\
+\small ORCID 0009-0001-6244-5262\\
+\small \url{https://github.com/VishnuVaidyanathan/BB5-decimal-macrogrammar}}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The Marxen--Buntrock machine is the 5-state Busy Beaver winner: it halts after
+$47{,}176{,}870$ steps. Its high-level behaviour has been known since Buro (1990) and
+Michel (1993), who showed that it follows a Collatz-like map. We study the same machine
+through its \emph{transcript}, the sequence of state--symbol pairs it visits, written
+as decimal digits. We give a closed-form grammar for the entire transcript: it is
+\texttt{0246} followed by 15 layers, each built from a repeated word $(159)^M$, an
+opening gate (\texttt{02} or \texttt{1}), a ladder of rungs
+$4\,7^{n+2}\,6\,0\,3^{n+3}\,2$, a final rung $4\,7^{n+2}\,6\,0\,3^{n+4}\,2$ and the
+closing word \texttt{46}; the last layer ends in \texttt{158}. We prove in Coq, with no
+axioms, that the transcript of the machine from the blank tape is exactly this
+grammar, and that our layer map is the Buro--Michel map. The step count and the number
+of ones on the final tape follow from the proved configurations by short exact
+calculations.
+\end{abstract}
+
+% ------------------------------------------------------------------
+\section{Introduction}
+
+The Busy Beaver value $S(5)=47{,}176{,}870$ was determined in 2024 by the bbchallenge
+collaboration, with a proof checked in Coq~\cite{bbchallenge,coqbb5}. The value is set
+by the machine found by Marxen and Buntrock in 1989~\cite{marxen}:
+\[
+\texttt{1RB1LC\_1RC1RB\_1RD0LE\_1LA1LD\_1RZ0LA}.
+\]
+Its long run is well understood at a high level. Buro~\cite{buro} and, independently,
+Michel~\cite{michel93} showed that it follows a Collatz-like rule. In Michel's notation,
+let $g(x)$ be the configuration in state A next to a block of $x$ ones on an otherwise
+blank tape. Then
+\begin{equation}\label{eq:michel}
+g(3k)\to g(5k+6),\qquad g(3k+1)\to g(5k+9),\qquad g(3k+2)\to\text{halt},
+\end{equation}
+and from $g(0)$ the orbit $0,6,16,34,\dots,12284$ halts after 15 applications
+\cite{michelbeh,wikiBB5}.
+
+The bbchallenge paper calls the list of state--symbol pairs visited from the blank tape
+the \emph{transcript} of a machine, and uses back-to-back repeats in the transcript to
+decide machines that loop forever~\cite[Section~4.3.1]{bbchallenge}. The champion halts,
+so its transcript never repeats with a fixed period. But it does repeat with
+\emph{growing} counts, and these counts follow~\eqref{eq:michel}.
+
+\paragraph{Contributions.} This paper describes the champion's transcript exactly.
+\begin{enumerate}
+  \item A closed-form grammar for the whole transcript of $47{,}176{,}870$ symbols
+        (Theorem~\ref{thm:main}). Each layer is a short word with explicit exponents.
+  \item A Coq proof, with no axioms, that the transcript of the machine from the blank
+        tape is exactly this grammar (Section~\ref{sec:coq}). As far as we know, earlier
+        machine-checked proofs establish the champion's halting by running it, not by
+        its structure~\cite{bbchallenge,coqbb5}.
+  \item A proof in Coq that our layer map is the Buro--Michel map~\eqref{eq:michel}
+        under the change of variable $a=x+2$ (Proposition~\ref{prop:michel}).
+  \item Exact formulas for the steps spent in each layer, which add up to
+        $47{,}176{,}870$, and a short account of why the final tape holds $4{,}098$ ones
+        (Section~\ref{sec:counts}).
+\end{enumerate}
+The Collatz-like rule itself is not new. What is new is the transcript-level
+description and its formal proof.
+
+% ------------------------------------------------------------------
+\section{Preliminaries}
+
+\paragraph{The machine.} The transition table is
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+ & A & B & C & D & E\\
+\midrule
+read 0 & 1RB & 1RC & 1RD & 1LA & 1RZ\\
+read 1 & 1LC & 1RB & 0LE & 1LD & 0LA\\
+\bottomrule
+\end{tabular}
+\end{center}
+The machine starts in state A on a blank tape. We write the halting transition as
+$\mathrm{E0}\to\mathrm{1RZ}$; bbchallenge leaves E0 undefined~\cite{bbchallenge}.
+Both conventions give $47{,}176{,}870$ steps, and in ours the last step read E0.
+
+\paragraph{Configurations.} We write $\Z\,u\,\hd{s}{x}\,v\,\Z$ for the tape $u\,x\,v$
+surrounded by blanks, with the head in state $s$ on the cell holding $x$. Powers denote
+repetition, e.g.\ $1^a$ or $(001)^M$.
+
+\paragraph{Transcripts as digits.} The champion has exactly ten state--symbol pairs, so
+we write each one as a decimal digit:
+\[
+d(s,x) = 2\cdot\mathrm{idx}(s) + x,\qquad \mathrm{idx}(\mathrm{A})=0,\dots,
+\mathrm{idx}(\mathrm{E})=4.
+\]
+So A0\,=\,0, A1\,=\,1, B0\,=\,2, \dots, E1\,=\,9. The \emph{transcript} $T$ is the
+string of digits $d(s_i,x_i)$ for the steps $i=0,1,\dots,47{,}176{,}869$. This is the
+bbchallenge transcript~\cite{bbchallenge} written in digits; the digits only make the
+patterns easier to read.
+
+\paragraph{The first 100 digits.} The transcript of the champion begins as follows.
+Spaces and line breaks are added only to show where the words of the next section
+start; the digits themselves run on without breaks.
+\begin{center}
+\begin{minipage}{0.8\linewidth}
+\begin{verbatim}
+0246
+159  02  47777603333332  46
+159159159  02  4777760333332
+47777777776033333333332
+4777777777777776033333333333 ...
+\end{verbatim}
+\end{minipage}
+\end{center}
+The first line takes the blank tape to the first layer. The second line is the whole
+first layer: one $159$, the opening $02$, one rung and the close $46$. From the third
+line on, $159$ repeats three times, and each rung is longer than the one before: the
+runs of $7$s grow $4, 9, 14$ and the runs of $3$s grow $5, 10, \dots$
+
+% ------------------------------------------------------------------
+\section{The transcript grammar}
+
+\subsection{Words}
+
+We use the following words over the digits $0$--$9$.
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Name & Word & Meaning\\
+\midrule
+$\Omega$ & $159$ & one oscillation A1, C1, E1\\
+$R(n)$ & $4\,7^{n+2}\,6\,0\,3^{n+3}\,2$ & internal rung\\
+$F(n)$ & $4\,7^{n+2}\,6\,0\,3^{n+4}\,2$ & final rung\\
+$G_1$ & $02$ & Gate~1\\
+$G_2$ & $1$ & Gate~2\\
+$E$ & $46$ & close of a layer\\
+$H$ & $158$ & halt\\
+\bottomrule
+\end{tabular}
+\end{center}
+In the notation of the earlier versions, a rung $4\,7^{A}\,6\,0\,3^{B}\,2$ has $B=A+1$
+when internal and $B=A+2$ when final. We write $K=n+2$ for the length $A$ of the final
+rung.
+
+\subsection{Layers}
+
+A layer starts at the configuration
+\[
+S(a) \;=\; \Z\,1^{a}\,\hd{A}{1}\,1\,\Z ,
+\]
+with $a\ge 1$ ones to the left of the head. Write $a+1 = 3M + r$ with $0\le r\le 2$.
+The layer word $\W(a)$ and the next start $N(a)$ are:
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{clc}
+\toprule
+$r$ & $\W(a)$ & $N(a)$\\
+\midrule
+$0$ & $\Omega^{M}\; G_1\; R(2)\,R(7)\cdots R(5M-8)\; F(5M-3)\; E$ & $5M+3$\\
+$1$ & $\Omega^{M}\; G_2\; R(0)\,R(5)\cdots R(5M-5)\; F(5M)\; E$ & $5M+6$\\
+$2$ & $\Omega^{M}\; H$ & halt\\
+\bottomrule
+\end{tabular}
+\end{center}
+In words: the layer repeats $\Omega$ exactly $M$ times; then the remainder $r$ picks
+the gate; then the rungs grow by $5$ each time; a final rung closes the ladder; and
+\texttt{46} leads into the next layer. A Gate~1 layer has $M$ rungs and a Gate~2 layer
+has $M+1$ rungs, counting the final one. The final rung has
+$K = 5M-1$ (Gate~1) or $K = 5M+2$ (Gate~2), and in both cases $N(a) = K+4$.
+
+\begin{theorem}[Transcript grammar]\label{thm:main}
+Let $a_0 = 2$ and $a_{i+1} = N(a_i)$. Then $a_{14}+1 \equiv 2 \pmod 3$, and the
+transcript of the champion from the blank tape is exactly
+\[
+T \;=\; 0246\;\W(a_0)\,\W(a_1)\cdots\W(a_{14}).
+\]
+\end{theorem}
+
+\begin{proof}
+Proved in Coq as \coq{bb5\_decimal\_trace}; see Section~\ref{sec:coq}. The prefix
+\texttt{0246} takes the blank tape to $S(2)$. Lemmas~\ref{lem:omega}--\ref{lem:bridge}
+below give each layer.
+\end{proof}
+
+Table~\ref{tab:layers} lists the 15 layers. The first two layers read
+\begin{align*}
+\W(2) &= 159\;\,02\;\,4\,7^{4}\,6\,0\,3^{6}\,2\;\,46,\\
+\W(8) &= (159)^3\;\,02\;\,4\,7^{4}\,6\,0\,3^{5}\,2\;\;4\,7^{9}\,6\,0\,3^{10}\,2\;\;
+          4\,7^{14}\,6\,0\,3^{16}\,2\;\,46 .
+\end{align*}
+The prefix \texttt{0246} is itself $G_1$ followed by $E$: it is a layer with no
+oscillations and no rungs.
+
+\begin{table}[t]
+\centering
+\caption{The 15 layers of the transcript. $a$: ones left of the head at the layer
+start; $x=a-2$: Michel's value; $M$: number of $\Omega$; $K$: length $A$ of the final
+rung; steps: length of $\W(a)$. The four steps of \texttt{0246} come first; the total
+is $47{,}176{,}870$.}
+\label{tab:layers}
+\small
+\begin{tabular}{rrrrcrrr}
+\toprule
+Layer & $a$ & $x$ & $M$ & Word & Rungs & $K$ & Steps\\
+\midrule
+1  & 2     & 0     & 1    & Gate 1 & 1    & 4     & 21\\
+2  & 8     & 6     & 3    & Gate 1 & 3    & 14    & 83\\
+3  & 18    & 16    & 6    & Gate 2 & 7    & 32    & 295\\
+4  & 36    & 34    & 12   & Gate 2 & 13   & 62    & 937\\
+5  & 66    & 64    & 22   & Gate 2 & 23   & 112   & 2{,}807\\
+6  & 116   & 114   & 39   & Gate 1 & 39   & 194   & 8{,}039\\
+7  & 198   & 196   & 66   & Gate 2 & 67   & 332   & 22{,}915\\
+8  & 336   & 334   & 112  & Gate 2 & 113  & 562   & 64{,}637\\
+9  & 566   & 564   & 189  & Gate 1 & 189  & 944   & 180{,}689\\
+10 & 948   & 946   & 316  & Gate 2 & 317  & 1582  & 504{,}665\\
+11 & 1586  & 1584  & 529  & Gate 1 & 529  & 2644  & 1{,}405{,}029\\
+12 & 2648  & 2646  & 883  & Gate 1 & 883  & 4414  & 3{,}908{,}163\\
+13 & 4418  & 4416  & 1473 & Gate 1 & 1473 & 7364  & 10{,}864{,}853\\
+14 & 7368  & 7366  & 2456 & Gate 2 & 2457 & 12282 & 30{,}201{,}445\\
+15 & 12286 & 12284 & 4095 & Halt   & --   & --    & 12{,}288\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------------
+\section{Tape lemmas}\label{sec:lemmas}
+
+Each word of the grammar comes from a simple change on the tape. Each lemma below is
+proved in Coq for all values of its parameters; the Coq names are given in brackets.
+The intermediate configurations are close to those used in the analyses of Buro and
+Michel~\cite{buro,michel93}; we state them because the grammar is read directly from
+them.
+
+\begin{lemma}[$\Omega$ block; \coq{omega\_block\_tr}]\label{lem:omega}
+For $M\ge1$ and any symbol $y$,
+\[
+\Z\,u\,y\,1^{3M-1}\,\hd{A}{1}\,v\,\Z
+\;\xrightarrow{\;(159)^M\;}\;
+\Z\,u\,\hd{A}{y}\,(001)^{M}\,v\,\Z .
+\]
+\end{lemma}
+Each $\Omega$ moves the head three cells to the left and turns $111$ into $001$
+(A1 writes 1, C1 and E1 write 0). So $M$ oscillations remove $2M$ ones.
+
+\begin{lemma}[Rung; \coq{rung\_tr}]\label{lem:rung}
+For $n\ge0$,
+\[
+\Z\,1^{n}\,\hd{C}{0}\,1\,0\,0\,w
+\;\xrightarrow{\;R(n)\;}\;
+\Z\,1^{n+5}\,\hd{C}{0}\,w ,
+\]
+in $2n+9$ steps, where the head ends on the last $0$ of $100$.
+\end{lemma}
+The rung runs C0, then D sweeps left over $n+2$ ones (the $7$s), D0 and A0 add two ones
+at the left end (the $6\,0$), and B sweeps right over $n+3$ ones (the $3$s) before B0
+(the $2$). One unit $100$ is filled, and two cells are added on the left: the block
+grows by $5$. Repeating the lemma gives a ladder $R(n)\,R(n+5)\cdots$
+(\coq{ladder\_tr}).
+
+\begin{lemma}[Final rung; \coq{terminal\_rung\_tr}]\label{lem:final}
+For $n\ge0$,
+\[
+\Z\,1^{n}\,\hd{C}{0}\,1\,1\,\Z
+\;\xrightarrow{\;F(n)\;}\;
+\Z\,1^{n+6}\,\hd{C}{0}\,\Z ,
+\]
+in $2n+10$ steps.
+\end{lemma}
+The extra $3$ in the B sweep is the trailing pair $11$ on the right, which is the
+leftover of the start configuration $S(a)$.
+
+\begin{lemma}[Gates, halt and close]\label{lem:bridge}
+After the $\Omega$ block of $S(a)$, with $a+1 = 3M+r$:
+\begin{itemize}
+\item $r=0$: $\Z\,\hd{A}{0}\,(001)^M\,1\,\Z \xrightarrow{\;02\;}
+      \Z\,1\,1\,\hd{C}{0}\,(100)^{M-1}\,1\,1\,\Z$;
+\item $r=1$: $\Z\,\hd{A}{1}\,(001)^M\,1\,\Z \xrightarrow{\;1\;}
+      \Z\,\hd{C}{0}\,(100)^{M}\,1\,1\,\Z$;
+\item $r=2$: $\Z\,1\,\hd{A}{1}\,(001)^M\,1\,\Z \xrightarrow{\;158\;}$ halt.
+\end{itemize}
+After the final rung, $\Z\,1^{m}\,\hd{C}{0}\,\Z \xrightarrow{\;46\;} S(m)$.
+\end{lemma}
+In Coq these are \coq{layer\_gate1\_tr}, \coq{layer\_gate2\_tr},
+\coq{layer\_halt\_tr} and \coq{bridge\_46}. The gate is decided by what is left when the $\Omega$ block reaches the left end of
+the block of ones: nothing ($r=0$), one cell ($r=1$) or two cells ($r=2$). With two
+cells left, E reads a $0$ and the machine halts.
+
+Combining the lemmas: in a Gate~1 layer the ladder starts at $n=2$ and has $M-1$
+internal rungs, so the final rung has $n = 5M-3$ and the next start is
+$a' = n+6 = 5M+3$. In a Gate~2 layer the ladder starts at $n=0$ and has $M$ internal
+rungs, so $n = 5M$ and $a' = 5M+6$. This is the table for $N(a)$.
+
+% ------------------------------------------------------------------
+\section{Relation to the Buro--Michel map}
+
+\begin{proposition}[\coq{layer\_map\_is\_michel}]\label{prop:michel}
+For every $x\ge0$, the layer map $N$ at $a=x+2$ is the map~\eqref{eq:michel} shifted
+by $2$: if $x=3k$ then $N(x+2) = (5k+6)+2$; if $x=3k+1$ then $N(x+2) = (5k+9)+2$; if
+$x=3k+2$ the layer halts.
+\end{proposition}
+
+So the layer starts $a_i$ are Michel's orbit $x_i$ plus $2$ (Table~\ref{tab:layers}).
+Since $N(a)=K+4$, Michel's next value is $x' = K+2$. Two consequences, which restate
+the known rule in the terms of the grammar:
+\begin{corollary}[\coq{gate\_law}, \coq{recurrence\_8\_1}]\label{cor:gate}
+Let $K$ be the final-rung length of a layer. The next layer has
+\[
+M' = \left\lfloor \tfrac{K+2}{3} \right\rfloor + 1,
+\]
+and it is a Gate~1 layer if $(K+2)\bmod 3 = 0$, a Gate~2 layer if $(K+2)\bmod 3 = 1$,
+and the halting layer if $(K+2)\bmod 3 = 2$.
+\end{corollary}
+For the champion, the remainder $2$ first appears after layer~14, where $K+2=12284$.
+
+% ------------------------------------------------------------------
+\section{Steps and ones}\label{sec:counts}
+
+\paragraph{Steps.} The step counts in Lemmas~\ref{lem:omega}--\ref{lem:bridge} give the
+length of each layer word:
+\[
+|\W(a)| =
+\begin{cases}
+5M^2 + 11M + 5 & \text{Gate 1},\\
+5M^2 + 17M + 13 & \text{Gate 2},\\
+3M + 3 & \text{halt}.
+\end{cases}
+\]
+With the four steps of \texttt{0246}, the 15 layers add up to exactly $47{,}176{,}870$
+steps (Table~\ref{tab:layers}). The formulas are sums of the proved step counts; the
+total is checked by exact integer arithmetic. It is not yet stated inside Coq, because
+Coq's unary natural numbers make a number of this size impractical; a version with
+binary numbers is future work. The total agrees with the stage counts of
+Michel~\cite{michelbeh}, which use different stage boundaries.
+
+\paragraph{Ones.} The start $S(a)$ holds $a+2$ ones. Writing $a+1 = 3M+r$ and
+$g = r+1$, this is $3M + g$, and after the $\Omega$ block there are $M+g$ ones
+(Lemma~\ref{lem:omega}). In the halting layer, $M = 4095$ and $g = 3$, leaving
+$4095+3 = 4098$ ones. The final word $158$ does not change this: C1 erases a one and
+E0 writes one. This gives $\Sigma(5) = 4098$ for the champion.
+
+% ------------------------------------------------------------------
+\section{The Coq proof}\label{sec:coq}
+
+The development is the file \coq{coq/BB5Omega.v} in the repository (about 840 lines,
+Coq~8.18). It uses no axioms: \coq{Print Assumptions} on the main theorems reports
+that they are closed under the global context.
+
+\paragraph{Model.} A configuration is a state, the list of cells to the left of the
+head (nearest first), the cell under the head, and the list of cells to the right. An
+empty list stands for blanks. \coq{step} applies the transition table, and
+\coq{trace n c} lists the digits $2\cdot\mathrm{idx}(s)+x$ of the first $n$ steps from
+$c$. The key fact used everywhere is
+\[
+\coq{trace}\,(p+q)\,c \;=\; \coq{trace}\,p\,c \;\cdot\; \coq{trace}\,q\,(\coq{steps}\,p\,c).
+\]
+
+\paragraph{Proof structure.} Each tape lemma is proved twice: once for the
+configuration it reaches and once for the digits it writes. Sweeps and blocks of any
+length are handled by induction. The layer lemmas are put together into
+\coq{layer\_correct\_tr}, which covers every $a\ge1$. A short recursion then runs the
+layer map from $a=2$; Coq computes that it halts after 15 layers
+(\coq{fifteen\_layers}) and the sequence of $M$ values (\coq{M\_sequence}).
+
+\paragraph{Main statement.} Here \coq{grammar 20 2} is the concatenation of the layer
+words starting from $a=2$ (20 is an upper bound on the number of layers):
+\begin{lstlisting}
+Theorem bb5_decimal_trace :
+  exists n, state (steps n (A, [], false, [])) = Z
+         /\ trace n (A, [], false, []) = [0; 2; 4; 6] ++ grammar 20 2.
+\end{lstlisting}
+As an extra check, we computed the first five layers of \coq{grammar} inside Coq
+($4{,}147$ digits) and compared them with an independent simulation; they agree. A
+separate Python script in the repository, \coq{verify\_gate\_law.py}, runs all
+$47{,}176{,}870$ steps and checks the layer data of Table~\ref{tab:layers} from the
+transcript.
+
+\paragraph{What is not in Coq.} The total step count and the final count of ones are
+derived from the proved lemmas by arithmetic, as in Section~\ref{sec:counts}, but are
+not stated as Coq theorems.
+
+% ------------------------------------------------------------------
+\section{A smaller case: BB(4)}
+
+The same lens applied to the 4-state winner
+\texttt{1RB1LB\_1LA0LC\_1RZ1LD\_1RD0RA} ($107$ steps, $13$ ones; digits $0$--$7$)
+gives
+\[
+0212\;(03567)^3\;0212\,1\,3567\;(03567)^4\;0212\,1\,357\,1212\;(03567)^4\;
+0212\,1\,357\,12\;(03567)^2\;0212\,1\,34 .
+\]
+There is a repeated word ($03567$), a gate-like opening ($0212$) and a halt by a change
+of one digit at the end of the repeated word ($35\to34$, as $159\to158$ for BB(5)). But
+the counts $3,4,4,2$ do not grow, and there is no layer map. This is only an
+observation on one small run; we do not claim a general pattern.
+
+% ------------------------------------------------------------------
+\section{Discussion}
+
+\paragraph{Growing repeats.} The bbchallenge decider for loops looks for a transcript
+block that repeats back-to-back with a fixed length~\cite[Algorithm~1]{bbchallenge}. The
+champion's transcript is made of blocks that repeat a growing number of times, and the
+counts follow a Collatz-like map. A natural question is whether such grammars can be
+found automatically: detect growing repeats in a transcript, fit a layer map from a few
+layers, and then iterate the map instead of the machine. For BB(5) the first layers can
+mislead: $M = 1,3,6,12,22$ looks like doubling before the ratio settles near $5/3$. So
+several layers, and every remainder class, must be seen before a map is trusted. Even a
+correct map does not settle halting in general: for machines such as
+Antihydra~\cite{bbchallenge} the question becomes a hard Collatz-like problem.
+
+\paragraph{Formal proofs of champions.} The Coq proof of $S(5)$ needs only that the
+champion halts within $47{,}176{,}870$ steps, which it checks by running
+it~\cite{bbchallenge}. A structural proof, as here, says why. Proofs of this kind may
+be useful for larger champions, whose runs are far too long to execute.
+
+\paragraph{Future work.} (1) State the step count and the count of ones in Coq, using
+binary numbers. (2) Try transcript grammars on other Collatz-like machines, including
+BB(6) champions. (3) Extract layer maps from transcripts automatically.
+
+% ------------------------------------------------------------------
+\section{Conclusion}
+
+The transcript of the BB(5) champion has an exact grammar: \texttt{0246} followed by 15
+layers of the form $(159)^M$, a gate, a ladder of rungs that grow by five, a final rung
+and \texttt{46}, with a last layer ending in \texttt{158}. The grammar is the
+Buro--Michel map seen at the level of single steps. We proved in Coq, without axioms,
+that the machine's transcript is exactly this grammar.
+
+\section*{Acknowledgements}
+Parts of the analysis and of
+the Coq development were carried out with the help of an AI assistant (Claude,
+Anthropic); the author checked all results, and the Coq proofs are checked by the Coq
+kernel.
+
+\begin{thebibliography}{99}
+
+\bibitem{bbchallenge}
+The bbchallenge Collaboration: J.~Blanchard, D.~Briggs, K.~Deka, N.~Fenner,
+Y.~Forster, G.~Georgiev (Skelet), M.~L.~House, R.~Hunter, Iijil, M.~K\k{a}dzio\l{}ka,
+P.~Kropitz, S.~Ligocki, mxdys, M.~Na\'sciszewski, savask, T.~St\'erin, C.~Xu, J.~Yuen,
+T.~Zimmermann.
+\newblock Determination of the fifth Busy Beaver value.
+\newblock arXiv:2509.12337, 2025.
+
+\bibitem{coqbb5}
+mxdys.
+\newblock Coq-BB5: a Coq proof that $S(5) = 47{,}176{,}870$.
+\newblock \url{https://github.com/ccz181078/Coq-BB5}, 2024.
+
+\bibitem{marxen}
+H.~Marxen and J.~Buntrock.
+\newblock Attacking the Busy Beaver 5.
+\newblock \emph{Bulletin of the EATCS}, 40:247--251, 1990.
+
+\bibitem{buro}
+M.~Buro.
+\newblock Ein Beitrag zur Bestimmung von Rados $\Sigma(5)$ oder Wie f\"angt man fleissige Biber?
+\newblock Schriften zur Informatik und angewandten Mathematik, Report No.~146, RWTH Aachen, 1990.
+
+\bibitem{michel93}
+P.~Michel.
+\newblock Busy beaver competition and Collatz-like problems.
+\newblock \emph{Archive for Mathematical Logic}, 32:351--367, 1993.
+
+\bibitem{michelsurvey}
+P.~Michel.
+\newblock The Busy Beaver competition: a historical survey.
+\newblock arXiv:0906.3749, 2022.
+
+\bibitem{michelbeh}
+P.~Michel.
+\newblock Behavior of busy beavers.
+\newblock \url{https://bbchallenge.org/~pascal.michel/beh}.
+
+\bibitem{wikiBB5}
+BusyBeaverWiki.
+\newblock BB(5) champion.
+\newblock \url{https://wiki.bbchallenge.org/wiki/BB(5)_champion}.
+
+\bibitem{aaronson}
+S.~Aaronson.
+\newblock The Busy Beaver frontier.
+\newblock \emph{SIGACT News}, 51(3):32--54, 2020.
+
+\bibitem{rado}
+T.~Rad\'o.
+\newblock On non-computable functions.
+\newblock \emph{Bell System Technical Journal}, 41(3):877--884, 1962.
+
+\end{thebibliography}
+
+\end{document}

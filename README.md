@@ -3,12 +3,23 @@
 This repository contains a structural macro-analysis of the 
 Marxen–Buntrock BB(5) step champion (47,176,870 steps).
 
+The champion's high-level Collatz-like rule is due to Buro (1990) and
+Michel (1993). This work describes the champion's full transcript at the
+level of single steps, and proves that description in Coq.
+
+## Paper
+
+**A Proved Transcript Grammar for the BB(5) Champion** — Vishnu Vaidyanathan, November 2026.
+
+- SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6520560
+- PDF and LaTeX source: [`Paper/v4/`](Paper/v4/)
+
 ## Core Ideas
 
 - Decimal encoding of state-symbol trace
 - Oscillator blocks (159^M)
 - Layer termination via (K, K+2)
-- Gate bifurcation (lead02 vs lead14)
+- Gate bifurcation (02 vs 1)
 - Ones-on-tape invariant
 
 ## Verified Results
