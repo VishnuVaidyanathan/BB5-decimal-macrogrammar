@@ -1,0 +1,305 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\w}[1]{\mathtt{#1}}
+\newcommand{\coq}[1]{\texttt{#1}}
+\newcommand{\nm}[1]{\mathrm{#1}}
+
+\title{A Transcript Grammar for the Claimed BB(7) Champion\\
+\large One move, one gate, and a Coq proof of both --- working notes}
+\author{Vishnu Vaidyanathan\\
+\small \texttt{vishnu@edgi.in}\\
+\small ORCID 0009-0001-6244-5262\\
+\small \url{https://github.com/VishnuVaidyanathan/BB5-decimal-macrogrammar}}
+\date{11 November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+These are working notes, not a paper. We study the claimed BB(7) champion
+through its transcript, written one digit per step. After a fixed start of
+$319$ digits, every digit we can observe is produced by a single move word
+$W(P,j)$ applied again and again, and the tape changes by one rule. A second
+word describes the halt, and a third a restart. Which of the two happens is
+decided by a gate: whether a number $P$ is odd or even. The grammar reproduces
+the first $60$ million digits of the run exactly, without running the machine.
+We prove in Coq, with no axioms, that the move holds for all values of its
+parameters, with its exact step count, and that the gate halts the machine when
+$P$ is even. We do not prove the whole run: whether the rule applies until the
+end, the halting time, and the claimed bound all remain open.
+\end{abstract}
+
+\section{The machine and what is claimed}
+
+\[
+\texttt{1RB0RG\_1RC1RB\_0RD1RZ\_0LE0LD\_0LF1LE\_1RA1LF\_1LC0RB}
+\]
+The machine was found by Jeff Ketchersid in October 2026. The BusyBeaverWiki
+lists it as the BB(7) champion with a bound of $3\uparrow^{20}3$ and marks the
+claim as not independently verified \cite{wiki}. These notes do not verify that
+claim, and the discoverer may already have rules equivalent to the ones below.
+Everything here was found from the transcript and from small test tapes.
+
+\paragraph{Digits.} There are $14$ state--symbol pairs. Each step is written as
+$2\cdot(\text{state index})+(\text{symbol read})$, with ten to thirteen written
+$\w{a},\w{b},\w{c},\w{d}$:
+
+\begin{center}
+\begin{tabular}{lccccccc}
+\toprule
+ & A & B & C & D & E & F & G\\
+\midrule
+reads 0 & $\w0$ & $\w2$ & $\w4$ & $\w6$ & $\w8$ & $\w{a}$ & $\w{c}$\\
+reads 1 & $\w1$ & $\w3$ & $\w5$ & $\w7$ & $\w9$ & $\w{b}$ & $\w{d}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The digit $\w5$ (C reads 1) is the halt. Three digits repeat in long
+runs: $\w3$ (B walks right over ones), $\w9$ and $\w{b}$ (E and F walk left
+over ones).
+
+\section{The tape shape}
+
+At certain moments the tape is
+\[
+1\;0\;[\mathrm{G}\ 0]\;\; 1^{P}\; 0^{g_1}\; 1^{c_1}\; 0^{g_2}\; 1^{c_2}\;\cdots
+\]
+with the head in state G on a $0$, the two cells $1\,0$ to its left, and
+blank cells further left. We call this a \emph{clean shape}. To the right of
+the head is a row of blocks of ones separated by gaps of zeros. The first block
+has length $P$. A block $1100$ of the earlier notes is simply a block of two
+ones followed by a gap of two; we call it a \emph{unit}.
+
+\section{The words}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Name & Digits\\
+\midrule
+$\nm{Open}$ & $\w{c47698a03}$\\
+$\nm{Round}(n)$ & $\w{2476}\,\w9^{n}\,\w{8a0}\,\w3^{n}$\\
+$\nm{Build}(P)$ & $\nm{Round}(4)\,\nm{Round}(7)\cdots\nm{Round}(3P+1)$ \quad ($P$ rounds)\\
+$\nm{Close}(n)$ & $\w{2468}\,\w{b}^{n}$\\
+$\nm{Count}(k)$ & $\w{a1d}\,\w3^{k}\,\w{2468}\,\w{b}^{k+1}$\\
+$\nm{Wait}$ & $\w{c476998ba1}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Every word below starts with the same piece,
+\[
+\nm{Head}(P,j) \;=\; \nm{Open}\;\nm{Build}(P)\;\nm{Close}(3P+4)\;
+\nm{Count}(3P+2)\,\nm{Count}(3P+1)\cdots\nm{Count}(3P+4-2j),
+\]
+which has $2j-1$ countdown lines. Write $m = 3P+3-2j$.
+
+\paragraph{The move word.}
+\[
+W(P,j) \;=\; \nm{Head}(P,j)\;\;\w{a1d}\,\w3^{m}\;\nm{Round}(m+1)\;
+\w{2476}\,\w9^{m+5}\,\w{8ba1}\;\;\nm{Wait}^{\,j-1}.
+\]
+Its length is
+\[
+|W(P,j)| \;=\; 3P^{2}+27P+44+2j+(2j-1)(6P+14-2j).
+\]
+For $j=1$ this is the five-line block of the earlier notes, of length
+$3P^{2}+33P+58$.
+
+\paragraph{The halting word.}
+\begin{align*}
+H(P,j) \;=\;\; & \nm{Head}(P,j)\;\;\w{a1d}\,\w3^{m}\;\nm{Round}(m+1)\;\nm{Close}(m+5)\\
+ & \nm{Count}(m+3)\cdots\nm{Count}(0)\;\;\w{a1c47698b}\;(\w{a1c476998b})^{(m+3)/2}\;\w{ba1d25}.
+\end{align*}
+It ends in $\w5$, the only $\w5$ of the run.
+
+\paragraph{The restart word} (seen for $j=1$ and $j=2$). It is $H(P,j)$ up to
+and including $\w{a1c47698b}$, then $(\w{a1c476998b})^{m/2+1}$, then a fixed
+ending that depends only on $j$ (given in the script).
+
+\section{The rule}
+
+A move looks only at $P$, the first gap $g_1=2j$ and the first block $c_1=Z$.
+
+\paragraph{Move} ($Z\ge2$). The machine prints $W(P,j)$ and
+\[
+1^{P}\;0^{2j}\;1^{Z}\;R \quad\longrightarrow\quad
+(1100)^{j-1}\;1^{3P+8-2j}\;00\;1^{Z-2}\;R .
+\]
+\begin{itemize}
+\item \emph{Gap of 2} ($j=1$): $P$ becomes $3P+6$ and the block loses two. This
+is the tripling: $P+3$ is multiplied by $3$.
+\item \emph{Larger gap}: $j-1$ new units appear in front, so the first block is
+now a unit ($P=2$), and the old $P$ becomes a new block of $3P+8-2j$ ones.
+\item \emph{When $Z-2=0$} the gap of two that follows joins the next gap, which
+therefore grows by two.
+\end{itemize}
+
+\paragraph{The gate} ($Z=1$). There is nothing to take two from, and the parity
+of $P$ decides.
+\begin{center}
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.58\textwidth}@{}}
+\toprule
+$P$ even & the machine halts and prints $H(P,j)$\\
+$P$ odd, and the $1$ is the last cell & restart: it builds $(3P-1)/2$ fresh
+units and goes on\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{The run}
+
+The run is
+\[
+\text{Start}\;\; R(13,2)\;\; W(P_1,j_1)\; W(P_2,j_2)\; W(P_3,j_3)\cdots\; H(P,j).
+\]
+\begin{itemize}
+\item \textbf{Start}: a fixed word of $319$ digits. After it the tape is clean
+with $P=13$, a gap of $4$ and a single $1$.
+\item \textbf{The gate, first time}: $P=13$ is odd, so the machine restarts and
+builds $(3\cdot13-1)/2=19$ units. At step $3{,}954$ the tape is clean with
+$P=16$, a gap of $4$, nineteen units and a last single $1$.
+\item \textbf{From then on everything is even.} If $P$ is even then $3P+6$,
+$3P+8-2j$ and $2$ are even, new units are blocks of two, and blocks only lose
+two at a time. So no block can become a single $1$, and the gate is not met
+again until the last cell of the tape is reached. At that moment $P$ is even
+and the machine halts.
+\end{itemize}
+So, unlike the mod-3 gate of the BB(5) champion, which is tested at every
+layer, this gate is tested once near the start and once at the very end.
+
+\paragraph{The first steps of the real run.}
+\begin{center}
+\begin{tabular}{rll}
+\toprule
+Step & Move & Tape after it (blocks and gaps)\\
+\midrule
+$3{,}954$ & restart $R(13,2)$ & $P=16$;\ gap 4;\ 19 units;\ $1$\\
+$5{,}520$ & $W(16,2)$ & $P=2$;\ gap 2, block 52;\ gap 4;\ 18 units;\ $1$\\
+$5{,}656$ & $W(2,1)$ & $P=12$;\ gap 2, block 50;\ gap 4;\ 18 units;\ $1$\\
+$\approx 6.06\times10^{25}$ & $W(\cdot,1)$, 25 times & $P=15\cdot3^{25}-3$;\ gap 6;\ 18 units;\ $1$\\
+\bottomrule
+\end{tabular}
+\end{center}
+The last line is at step $60{,}572{,}642{,}711{,}595{,}382{,}146{,}057{,}206$.
+
+\paragraph{Why it runs so long.} Each time a block is used up, two gaps join
+and the next move has a larger $j$. A gap of 2 gives tripling; a gap of 4
+repeats a whole run of triplings for each two ones of the next block; and so
+on, one level higher for each larger gap. With nineteen units the gaps can grow
+to about twenty levels. This fits the shape of the claimed bound, but we have
+not worked out or proved any bound.
+
+\section{Tests}
+
+The script \texttt{bb7\_grammar.py} writes the digits from the grammar alone.
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Test & Result\\
+\midrule
+First $60{,}000{,}000$ digits of the real run & identical to the machine\\
+Single moves, $P=2\ldots15$ (odd and even), gaps $2\ldots12$ & 756 of 756 match\\
+Complete small runs to the halt & 169 of 169 identical\\
+\bottomrule
+\end{tabular}
+\end{center}
+These are tests, not proofs.
+
+\section{What is proved in Coq}
+
+File \texttt{BB7Moves.v} (668 lines, Coq 8.18). \texttt{Print Assumptions}
+reports that \coq{move}, \coq{halts\_gen} and \coq{tripling\_chain} are closed
+under the global context.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.72\textwidth}@{}}
+\toprule
+Name & Statement\\
+\midrule
+\coq{move} & The move of Section 4, for all $P$, $j\ge1$, $Z\ge2$ and any
+rest of the tape, whenever $m=3P+3-2j\ge1$. $P$ may be odd or even.\\
+\coq{wcost\_closed} & The move takes exactly $|W(P,j)|$ steps.\\
+\coq{triple} & $j=1$: $P\to3P+6$ in $3P^{2}+33P+58$ steps.\\
+\coq{chain}, \coq{tri\_closed} & $n$ triplings in a row; $P$ ends as
+$(P+3)\,3^{n}-3$.\\
+\coq{halts\_gen} & The gate: if $m$ is odd (that is, $P$ even) and the block
+after the gap is a single last $1$, the machine halts.\\
+\coq{start} & The blank tape reaches the clean shape of step $3{,}954$.\\
+\coq{at\_5656} & The tape at step $5{,}656$.\\
+\coq{tripling\_chain} & The tape after the 25 triplings, at step
+$5656+\coq{chcost 25 12}$.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The proof follows the words: one lemma for each repeated digit
+($\w3$, $\w9$, $\w{b}$), one for a round, a countdown line and a waiting line,
+and short computations for the fixed pieces. The term \coq{chcost 25 12} equals
+the 26-digit step number above by the same arithmetic done outside Coq.
+
+\paragraph{Not proved.}
+\begin{enumerate}
+\item \textbf{The whole run.} The move needs $m\ge1$, that is, a gap that is
+not too large for $P$. We believe the run always satisfies this, because a
+small $P$ only appears right after a move, when the gaps in front of it are new
+and small; but this is an argument in words. Without it there is no theorem
+that the machine halts and no exact halting time.
+\item \textbf{The restart} for general odd $P$. The one in the real run is
+covered only by running the machine inside Coq up to step $3{,}954$.
+\item \textbf{The digit strings.} The step counts equal the lengths of the
+words, but the words themselves are not stated as theorems.
+\item \textbf{The claimed bound.}
+\end{enumerate}
+
+\section{Open questions}
+
+\begin{enumerate}
+\item Prove that the run stays inside the rule until the last cell is reached.
+This would give a proof of halting and an exact expression for the halting
+time, as was done for the BB(6) champion \cite{bb6}.
+\item Work out the growth exactly: what is the state when each unit is used
+up, and what bound does that give?
+\item Prove the restart word for all odd $P$, so that the start is $319$ digits
+and nothing else.
+\item Explain the $319$-digit start. There is a clean shape already at step
+$26$.
+\item What does the machine do outside the rule ($m<1$)?
+\end{enumerate}
+
+\section*{Acknowledgements}
+
+The machine is due to Jeff Ketchersid. The four readable rules, the repeating
+block and the tripling were found by the author by reading the compressed
+transcript. The tape analysis, the tests and the Coq development were done with
+the help of an AI assistant (Claude, Anthropic); the Coq proofs are checked by
+the Coq kernel.
+
+\begin{thebibliography}{9}
+\bibitem{wiki}
+BusyBeaverWiki. \emph{BB(7)}. \url{https://wiki.bbchallenge.org/wiki/BB(7)},
+read 11 November 2026.
+\bibitem{bb5}
+V. Vaidyanathan. \emph{A Proved Transcript Grammar for the BB(5) Champion}.
+November 2026.
+\bibitem{bb6}
+V. Vaidyanathan. \emph{Exact Step Counts and an Exact Halting Time for the
+BB(6) Champion, Proved in Coq}. November 2026.
+\end{thebibliography}
+
+\end{document}

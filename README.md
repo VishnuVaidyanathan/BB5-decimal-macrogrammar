@@ -58,3 +58,10 @@ Still to formalize: the exact step count and ones count.
 The same transcript method applied to the BB(6) champion gives exact step
 counts for every move of the machine, proved in Coq. See [`bb6/`](bb6/).
 The tape rules there are the work of mxdys; this repo adds the step counts.
+
+## BB(7)
+
+The same method on the claimed BB(7) champion: a grammar that writes its
+digits without running the machine, and a Coq proof of its one move and of
+the halting gate. See [`bb7/`](bb7/). The machine is due to Jeff Ketchersid;
+its bound is not verified here.
