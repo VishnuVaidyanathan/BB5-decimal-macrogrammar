@@ -1,0 +1,302 @@
+# Designing a BB(7) machine from parts
+
+Working notes, 12 November 2026. Vishnu Vaidyanathan, with Claude.
+
+**Status: work in progress. No machine bigger than the known one has been found.**
+What we have is a method, four working parts, and one rule that explains why
+most designs fail. Everything below can be rerun from the files in this folder.
+
+---
+
+## 1. The idea
+
+The usual way to look for Busy Beaver machines is to try tables and watch what
+they do. We turn this around.
+
+We read the claimed BB(7) champion with the transcript lens (see `../README.md`)
+and saw that its table is not random. It is made of parts, and each part has a job:
+
+| Part | Job |
+|---|---|
+| Loop | multiply a block of ones by a fixed number |
+| Fuel | allow one multiplication per fuel unit, then stop |
+| Gate | when the fuel is gone, test the block (odd / even, or mod 3) |
+| Restart | turn the block into new fuel and start again |
+| Halt | one empty wire that the gate can reach |
+
+So the question becomes: **what is the grammar of the table itself?**
+Which small sets of wires can do each job, and how do the parts join?
+
+### Words used here
+
+- **Wire**: one entry of the table, for example `1RB` = write 1, move right, go to state B.
+  A 7-state machine has 14 wires.
+- **Empty wire** `---`: an entry not yet chosen.
+- **Door**: an empty wire that the machine reaches at a meaningful moment
+  (for example, exactly when a job is finished). Parts are joined at doors.
+- **Contract**: what a part must do, written as "tape before → tape after".
+- **Lazy search**: we do not try every table. We run the machine, and only when
+  it reaches an empty wire do we try the 28 ways to fill it. Wires never reached
+  are never filled. This is what makes the searches small.
+
+---
+
+## 2. First try: keep the champion's loop, change the rest
+
+File: `src/0_family_scan.c`
+
+The champion is `1RB0RG_1RC1RB_0RD1RZ_0LE0LD_0LF1LE_1RA1LF_1LC0RB`.
+Nine of its wires make the tripling loop (A0, B0, B1, C0, D0, D1, E0, E1, F0).
+We kept those nine and let the other five be anything: 3,073,280 tables.
+
+| Kind | Tables |
+|---|---|
+| Halt early | 917,505 (none later than step 2,000, checked to 200,000 steps) |
+| Run off to one side | 15,834 |
+| Stay tiny | 305,855 |
+| Still alive | 1,834,086 |
+| Alive and tripling | about 5,900 |
+
+- Most triplers carry no fuel.
+- A few dozen are "adders": each round adds a fuel unit instead of eating one. Never halt.
+- Only the champion (and one twin differing in G0) eats pre-built fuel.
+
+**Lesson.** On this loop the champion is alone. Its five free wires are all
+used, so nothing nearby can be bigger. A bigger machine needs a different design.
+
+---
+
+## 3. Part 1: the Loop
+
+File: `src/1_loops.c`
+
+Contract: start on `1^n 00 1^P`, end with one solid block, gaining a fixed
+number of ones per old one.
+
+| Loop | Smallest wiring found | Size |
+|---|---|---|
+| ×3 | `0LB0LA_1RC0LA_0RA---` | 3 states, 5 wires |
+| ×4 | `0LB0LA_0LC0LA_1RD---_0RB---` | 4 states, 6 wires |
+| ×5, ×6 | several | 8 wires |
+
+**Lesson.** Multiplying is cheap. The champion uses 6 states and 9 wires for
+it; 3 states and 5 wires are enough. There are thousands of such loops.
+
+### Engines (loops that feed themselves)
+
+File: `src/2_engines.c`, check with `src/engine_check.py`
+
+Contract: `[A] 0^g 1^P` comes back to the same shape with `kP + c`, forever.
+
+| Engine | Wiring | Checked |
+|---|---|---|
+| ×3 | `1RA0RB_1LD0LC_1RB---_0LA0LD` | 2 → 6 → 18 → 54 → 162 → 486 → 1458 → 4374 |
+| ×4 | `0RB1LC_0LC1RA_1LA0LD_1LB---` | 2 → 7 → 27 → 107 → 427 |
+| ×5 | `1LB1LA_1RC0LA_---0RD_1RA0RB` | 2 → 25 → 140 → 715 |
+
+With 7 wires there are 57 ×3 engines, three ×4, one ×5. List: `results/engines_7wires.txt`.
+
+**Lesson (a mistake we made).** These engines are *closed*. Their one empty
+wire is never reached, so nothing can be attached to them. A part is only
+useful if it has a real door.
+
+---
+
+## 4. Loops with a door
+
+File: `src/3_loops_with_door.c`
+
+New contract: `[A] 0^g 1^P` → one solid block `1^(kP+c)`, **and at that moment
+the machine reaches an empty wire**. That wire is the door. It means
+"the old block is used up".
+
+The simplest one: `0LB0LA_1RB1RC_---1LA` (3 states, 5 wires, ×3).
+It can be read like a sentence:
+
+- **A**: erase everything to the left, then step one more left.
+- **B**: fill ones to the right until the old block.
+- **C**: look at the next cell. If 1, go back and repeat. If 0, finished: door `C0`.
+
+We found 1,648 such loops (×3 and ×4) with up to 7 wires.
+Lists: `results/door_loops_5_6_wires.txt`, `results/door_loops_7_wires.txt.gz`.
+
+---
+
+## 5. Part 2: Fuel
+
+File: `src/4_fuel.c`
+
+Contract: put fuel units to the right of the block. Then
+
+- each unit gives exactly one more multiplication, and
+- when the fuel is gone, a second door opens with the tape as one clean block.
+
+The search takes each door-loop, adds a few wires, and tests with 0, 1, 2 and 3 units.
+
+| Total size | Found |
+|---|---|
+| 8 wires, 5 states | 1 machine |
+| 9 wires, 5 or 6 states | 396 different machines (most ×3, some ×4) |
+
+List: `results/engine_fuel_machines.txt` (table, door, door offset, fuel shapes that work).
+
+The 8-wire one: `1RB1LA_1RE0LC_---1LD_0LA0LB_---1RA`
+
+- Tape: `[A] 0 11 0` then units `110`.
+- Each unit turns the block Q into 3Q + 8.
+- Checked for 0 to 5 units: 8 → 32 → 104 → 320 → 968 → 2912 ones, each time
+  ending as one solid block at the door `E0`.
+
+We also built one by hand on the simple loop (add a "look right" state and a
+"walk back left" state: `0LB0LA_1RB1RC_1RE1LA_0LB1LD_---0LD`). It works, and the
+search found the same kind. So reading and searching agree.
+
+**Budget.** The champion spends 9 wires on tripling + fuel and has 5 left.
+The 8-wire machine leaves 6.
+
+---
+
+## 6. Part 3: Gate + Restart
+
+File: `src/5_gate_restart.c`, independent check: `src/door.py`
+
+Start at the fuel door: tape is a solid block `1^Q`. Add up to 3 to 5 wires.
+For each small Q the run must either
+
+- come back to the same door with a bigger block Q' (**restart**), or
+- stop at an empty wire (**halt**).
+
+This worked much faster than expected. Two examples, both checked separately in Python:
+
+**A mod-3 gate** — `1RB1LA_1RE0LC_---1LD_0LA0LB_0RF1RA_1LA1LF` (11 wires, 6 states)
+
+| Q mod 3 | What happens |
+|---|---|
+| 0 | small step: Q → Q + 5 |
+| 1 | restart: 4 → 41, 7 → 131, 10 → 401 (triples for every +3 in Q) |
+| 2 | halt (at wire `C0`) |
+
+**A mod-2 gate** — `1RA1RB_1RD1LC_0LA0LC_0LE1LD_0RA0LF_---1LE` (11 wires, 6 states)
+
+| Q | What happens |
+|---|---|
+| odd | halt (at wire `F0`) |
+| even | restart: 4 → 9, 6 → 30, 8 → 93, 10 → 282, 12 → 849 |
+
+So **Loop + Fuel + Gate + Restart + Halt fits in 6 states and 12 wires.**
+The seventh state is completely free.
+
+Lists: `results/gates_add3_all_machines.txt.gz` (3 added wires, on all 397
+Engine+Fuel machines, 2,663 gates) and `results/gates_add5_best_machine.txt.gz`
+(up to 5 added wires on the 8-wire machine, 3,616 gates).
+
+---
+
+## 7. The rule that decides everything: collapse
+
+A restart gives a block of the form
+
+    Q' = a · b^n + c        (b = the base, n grows with Q)
+
+The gate then tests Q' modulo m. Here is the problem:
+
+- base 3, gate mod 3: `3^n` is 0 mod 3, so Q' is always in the **same** class.
+- base 3, gate mod 2: `3^n` is always odd, so Q' always has the **same** parity.
+- base 4, gate mod 3: `4^n` is always 1 mod 3. Same again.
+
+We call this **collapse**. After the first restart the machine always lands in
+one fixed class. That class either halts (the run ends after one big step) or
+restarts (the run never ends). There is no long finite run.
+
+Of the gates found that can halt and grow: about 1,600 collapse, about 380 do not.
+
+The ones that do not collapse have a division in the formula. Example, the
+mod-2 gate above:
+
+    Q' = (21 · 3^n − 3) / 2,   n = (Q − 4) / 2
+
+Now the parity of Q' depends on whether n is odd or even. But following it one
+level further:
+
+- n even → Q' is odd → halt.
+- n odd → Q' is 2 mod 4 → the next n is odd again → the same forever.
+
+So this one also settles, just one level later: it halts after one restart or
+never.
+
+**The general rule.** The classes form a small finite map. A finite run can
+pass through each class at most once. So the number of big restarts before
+halting is at most (number of classes − 1). A tall finite tower needs a gate
+with many classes that feed each other in a long chain before reaching "halt".
+
+This is the real target now. It is no longer "find a tripler". It is
+**"find a gate whose class map has a long path to halt"**.
+
+---
+
+## 8. What is done and what is not
+
+Done:
+
+- [x] Loop: many, down to 3 states / 5 wires.
+- [x] Fuel: 397 machines, best 8 wires.
+- [x] Gate + Restart + Halt: thousands, in 6 states.
+- [x] The collapse rule.
+
+Not done:
+
+- [ ] A gate whose class map has a path of length 2 or more to halt.
+      Ideas: base and modulus that do not collapse (base 2 or 5 with mod 3,
+      base 3 with mod 4); fuel units of length 4; use the free seventh state
+      to add classes.
+- [ ] A **boot**: the machine must start from a blank tape in state A. None of
+      the designs here has been run from a blank tape. The free seventh state
+      (2 wires) is the natural place for it.
+- [ ] An exact calculator for the class map, so each candidate's fate can be
+      worked out without running it (the towers are far too big to simulate).
+- [ ] Comparison with the champion. We have not worked out how many restarts
+      the champion itself makes before halting.
+- [ ] Any proof. Nothing in this folder is proved in Coq.
+
+Limits of the searches (so nobody over-reads them):
+
+- Loops and engines: up to 8 wires, 6 states, only the tape shapes described.
+- Fuel: only fuel on the right, only units `1, 10, 100, 110, 1100, 1110, 1000, 101`.
+- Gates: tested only for Q = 3 to 14. Formulas are fitted from those values.
+- Only a handful of machines were re-checked by a second program
+  (the ones named in this file).
+
+---
+
+## 9. How to rerun
+
+    cd src
+    gcc -O2 -o loops   1_loops.c
+    gcc -O2 -o engines 2_engines.c
+    gcc -O2 -o dloops  3_loops_with_door.c
+    gcc -O2 -o fuel    4_fuel.c
+    gcc -O2 -o gate    5_gate_restart.c
+
+    ./loops 8 6 2 3            # max wires, max states, gap, n     (4 minutes)
+    ./engines 7 6 0 2          # max wires, max states, n, gap     (40 seconds)
+    ./dloops 7 6 1             # max wires, max states, gap        (15 seconds)
+    ./fuel 4 < ../results/door_loops_5_6_wires.txt   # add up to 4 wires
+    ./gate 3 1RB1LA_1RE0LC_---1LD_0LA0LB_---1RA E0 1 tag
+                               # add wires, table, door wire, door offset, label
+
+    python3 t2.py 0LB0LA_1RB1RC_---1LA "[]0111" 40        # step-by-step trace
+    python3 engine_check.py 1RA0RB_1LD0LC_1RB---_0LA0LD 0 2 7
+    python3 door.py 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0RA0LF_---1LE E1 0 3 12
+    python3 mixing.py gates.txt                           # collapse / no collapse
+
+Reading the output of `gate`: `res:` lists what happens for Q = 3, 4, 5, …, 14.
+A number is the new block size; `H` means it stopped at the empty wire named in
+`haltwire`.
+
+---
+
+## 10. Credits
+
+The BB(7) machine that started this is Jeff Ketchersid's. The method of
+reading a table as parts with jobs came out of the transcript-grammar work in
+this repository.
