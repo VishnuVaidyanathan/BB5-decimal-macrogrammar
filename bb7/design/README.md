@@ -635,7 +635,71 @@ third block waiting, so `F1` would never be reached. No halting machine there.
 
 **So lead 1 is closed. We are still one wire short.** Leads 2 and 3 remain.
 
-## 13. Credits
+## 13. The champion is one oscillator (and one try at finding another)
+
+### Reading the restart
+
+The champion's restart (steps 319 to 3,954 of the real run) uses no loop of
+its own. Phase by phase, with the real tape after each phase:
+
+    before        1 0 [G] 0  1^13  0000  1
+    1. triple     1^42 [B] 000000 1                         (Open + Build)
+    2. cross gap  1 0 1 0 1 0 [F] 0  1^40  00  1            (Close + 3 Count lines)
+    3. meet       1 0 1 0 1 0  1^42 [B] 0                   (the last 1 is swallowed)
+    4. go down    1 0 1 0 11 0 1 0 1 0 ... (42 pairs) [F] 0 1    (42 Count lines)
+    5. pack       1 0 1 0 11 [F] 0 1 0  11 00 11 00 ... (19 units) ... 1   (21 Wait lines)
+    6. ending     1 0 [G] 0  1^16  0000  11 00 ... (19 units) ... 1
+
+Vishnu's reading: this is not a restart. It is the **down phase of an
+oscillator**. The tape must nest down before it can go up.
+
+That fits the wires exactly. At the right end of the block the head looks two
+cells ahead (state D):
+
+| D reads | Digit | Stroke | Effect |
+|---|---|---|---|
+| 1 | 7 | up (a Round, `2476…`) | take one cell from the block on the right; the working block gains 3 |
+| 0 | 6 | down (a Count line, `…2468…`) | the block loses 1; a `1 0` pair is left on the left |
+
+So:
+
+| What we called it | What it is |
+|---|---|
+| tripling | up-strokes, while there is something on the right |
+| crossing a gap | a few down-strokes, until the next block is in view |
+| swap | a longer down, then up on the next block |
+| restart | down-strokes with nothing on the right, all the way to the bottom |
+
+Down is the default, because blank tape is 0. That is why the champion's
+restart costs no wire, and why our box-by-box designs came out one wire over:
+each box had its own wire to ask "is anything on the right?".
+
+At the bottom, state G reads 0 instead of 1 (digit c instead of d). That starts
+the Wait loop, which packs `1 0 1 0` into `11 00`. Then it goes up again.
+
+### One try at finding another oscillator
+
+Files: `src/10_down_stroke.c`, `src/11_oscillator.c`, `src/12_signature.c`
+
+1. **Down-stroke.** For each of the 1,648 up-stroke loops, add up to 3 wires
+   so that a solid block with nothing on its right is taken apart into small
+   pieces. Found 103,535 (the test is loose).
+2. **Up again.** On those with 9 wires or fewer, add up to 2 wires so that a
+   block twice the first top appears afterwards. Found 30,938 candidates
+   (27,780 different tables, `results/oscillator_candidates_loose.txt.gz`).
+3. **From a blank tape**, every start state, one extra wire allowed:
+   692 halts (longest 90,917 steps), 872,870 runs still going at 100,000 steps.
+4. **Signature** (small units present, big block growing, units getting
+   fewer). This scan was stopped early. Its hits were ordinary machines caught
+   in the middle of a pass, or machines that grow in a straight line with their
+   units untouched. We found no run where units are eaten one at a time the way
+   the champion eats them.
+
+**Result of this try: nothing.** The tests in steps 1, 2 and 4 are too loose
+to pick out an oscillator from the many machines that merely grow. A sharper
+contract is needed, written directly from the two strokes above.
+
+## 14. Credits
 
 The BB(7) machine that started this is Jeff Ketchersid's. The method of
 reading a table as parts with jobs came out of the transcript-grammar work in
