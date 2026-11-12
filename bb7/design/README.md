@@ -259,8 +259,9 @@ Not done:
 - [x] A boot from a blank tape (section 10).
 - [x] A first calculator for the class map (`src/fate.py`). It handles simple
       maps only; 343 maps were too irregular for it.
-- [ ] Comparison with the champion. We have not worked out how many restarts
-      the champion itself makes before halting.
+- [x] Why the champion is tall (section 11): a stack of counters and a swap
+      move, not a clever gate.
+- [ ] A design with the swap move (section 11, the new contract).
 - [ ] Any proof. Nothing in this folder is proved in Coq.
 
 Limits of the searches (so nobody over-reads them):
@@ -413,7 +414,104 @@ To check: `python3 verify_best.py` (about 5 minutes).
   restart. To get further we need a gate map with a longer path to halt
   (section 7).
 
-## 11. Credits
+## 11. How the champion really gets tall: one rule, a stack of counters
+
+After section 10 we asked the wrong question ("how do we make the gate
+cleverer?"). Going back to the champion's own move rule (`../bb7_grammar.py`,
+function `move`, proved in `../BB7Moves.v`) gives a different answer.
+
+### The tape is a stack
+
+The clean shape is `1^P`, then a list of (gap, block) pairs. The leftmost block
+is always P. The blocks after it are **counters**.
+
+### One rule, three behaviours, chosen by the gap
+
+| Gap after P | What the move does |
+|---|---|
+| 2 | **Triple.** P → 3P + 6. First counter loses 2. |
+| 4 | **Swap.** The tripled block becomes a new counter. A fresh P = 2 is planted on its left. The old first counter loses 2. |
+| 6 | Swap, and also plant one extra small counter (a block of 2). |
+
+And one more fact: **when a counter reaches 0 its two gaps join** (2 + 2 = 4,
+2 + 4 = 6). So an empty counter makes a wider gap, and a wider gap makes a swap.
+That is how "this level is finished" is passed up to the next level. Nothing
+tests it. The gap width is the signal.
+
+### Seen on the real tape
+
+    step 3954   [G] 1^16  0000  11 00 11 00 ... (19 units) ... 1
+    step 5520   [G] 11 00 1^52  0000  11 00 ... (18 units) ... 1     <- one move, gap 4
+    step 5656   [G] 1^12  00  1^50  0000  11 00 ...                  <- next move, gap 2
+
+After the gap-4 move the old block (now 52) is the counter and P is 2.
+Then 25 triplings use it up.
+
+### The run, in the big-number form
+
+    start    P=13            | gap4 1
+    RESTART  P=16            | gap4 2 , gap2 2 (x18) , gap2 1
+    swap     P=2             | gap2 52 , gap4 2 , gap2 2 (x17) , gap2 1
+    x3 (25)  P=4236443047212 | gap2 2 , gap4 2 , gap2 2 (x17) , gap2 1
+    x3       P=12709329141642| gap6 2 , gap2 2 (x17) , gap2 1
+    gap 6    P=2             | gap2 2 , gap2 38127987424928 , gap4 2 , gap2 2 (x16) , gap2 1
+    x3       P=12            | gap4 38127987424928 , gap4 2 , ...
+    swap     P=2             | gap2 40 , gap2 38127987424926 , gap4 2 , ...
+    x3 (19)  P=5811307332    | gap2 2 , gap2 38127987424926 , ...
+    x3       P=17433922002   | gap4 38127987424926 , gap4 2 , ...
+    swap     P=2             | gap2 52301766010 , gap2 38127987424924 , ...
+    next: 26,150,883,004 triplings in a row. P becomes about 3^(2.6 x 10^10).
+
+Look at the counter 38127987424924. Each swap takes only 2 from it, and each
+swap turns the whole current P into a new counter, which is one
+exponentiation. So this single counter gives about 1.9 x 10^13 exponentiations
+stacked on each other. And 16 more units are still waiting behind it.
+
+So the champion has not two levels but a ladder:
+
+| Level | Counted by | One step does |
+|---|---|---|
+| 1 | first counter, gap 2 | tripling |
+| 2 | second counter, gap 4 | exponentiation (swap) |
+| 3 | the units, gap 6 | a whole tower of level 2 |
+
+### Which wires do it
+
+The gap-2 move and the gap-4 move use the same loops. The differences:
+
+- **Count lines** (wires F1, A1, G1): 2j − 1 of them for a gap of 2j. They
+  carry the new block across the gap, so they measure the gap.
+- **Wait lines** (wire G0): j − 1 of them. Each one plants a `11 00` on the
+  left. With gap 2 there are none. With gap 4 there is one, and that planted
+  `11` is the new P.
+
+So the whole ladder costs the champion **one wire** (G0) on top of tripling
+and counting. No wire is spent per level.
+
+### What this changes for the design
+
+Our parts list in section 1 was too flat. The champion is not
+"loop + fuel + gate + restart" as four boxes. It is:
+
+1. one **move** that takes the gap as a parameter (triple or swap),
+2. counters that **join gaps when empty**,
+3. a **restart** that makes many units from P,
+4. a **gate** only for the very end.
+
+The boot is not a separate part. The champion's first 319 steps only reach a
+clean tape with P = 13 (odd) and no fuel. The restart then makes the 19 units.
+
+Our designed machines (section 10) have 1-level fuel only: a unit buys one
+tripling, and nothing ever swaps. That, and not the collapse rule, is why they
+stop at 10^328.
+
+**The new contract to search for** (on prepared tapes first, then from blank):
+
+    1^P  gap2  1^Z  rest   ->   1^(3P+c)  gap2  1^(Z-2)  rest             (triple)
+    1^P  gap4  1^Z  rest   ->   1^s  gap2  1^(3P+c')  gap2  1^(Z-2)  rest  (swap)
+    a counter at 0 joins its gaps
+
+## 12. Credits
 
 The BB(7) machine that started this is Jeff Ketchersid's. The method of
 reading a table as parts with jobs came out of the transcript-grammar work in
