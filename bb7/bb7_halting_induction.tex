@@ -285,10 +285,10 @@ No case with two or more units can be run to the end; the numbers are too large.
 no axioms): the start, the move for every width, the gate, the consume lemma for
 widths $1$ to $199$ (as ``the counter is used up, the next gap grows by $2j$, and
 the new block is even and large enough''), and
-\[
-\texttt{champion\_halts}:\quad \exists n,\ \text{the machine started on a blank
-tape is in the halt state after } n \text{ steps.}
-\]
+\begin{center}
+\texttt{champion\_halts}: there is an $n$ such that the machine, started on a
+blank tape, is in the halt state after $n$ steps.
+\end{center}
 Also \texttt{champion\_gate}: the run reaches one block, a gap of $42$ cells
 (width $21$) and the last $1$.
 \item \textbf{Proved on paper only}: the exact values, that is, that the new
