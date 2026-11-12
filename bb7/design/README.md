@@ -702,6 +702,49 @@ The 24 differences are all of two kinds:
 No other case occurs. So in 7,817 looks the rule "1 ahead = up, 0 ahead = down"
 never fails; it only needs the two footnotes above.
 
+### Rebuilding the champion from the reading
+
+File: `src/14_rebuild_champion.c`, list: `results/rebuild_31_tables.txt`
+
+Can the oscillator reading produce the champion's table, instead of only
+describing it?
+
+**Given:** only the nine up-stroke wires,
+`1RB---_1RC1RB_0RD---_0LE0LD_0LF1LE_1RA---_------`. Five wires are empty.
+
+**Step 1, the down-stroke and the bottom, as a contract.** Start on a solid
+block of Q ones with blank tape around it. The block must be taken apart and
+packed into units `11 00` (at least Q/2 − 3 units in a row, no more ones than
+Q + 4). Tested for Q = 12 and 16. The search fills empty wires only when the
+run reaches them.
+
+| Wires added | Tables tried | Passing |
+|---|---|---|
+| up to 3 | 2,605 | 0 |
+| up to 4 | 21,617 | 31 |
+
+The champion's four wires (A1 = 0RG, F1 = 1LF, G0 = 1LC, G1 = 0RB) are one of
+the 31. The smallest answer has 4 wires, the same number the champion uses.
+
+**Step 2, run all 31 from a blank tape** (3,000,000 steps):
+
+| What it does | Tables |
+|---|---|
+| halts within 21 steps | 4 |
+| writes units or one block forever, in a straight line, and never goes up | 24 |
+| big block with a trail of single ones | 1 |
+| **the oscillator tape** `1^2698 00 1^313 00 1^42 0000 11 00 11 00 …` | **2** |
+
+The two are the champion and its twin (G0 = 0LD instead of 1LC; same tape).
+
+**Step 3, the halt.** One wire is still empty: C1. It is the champion's halt.
+
+So: nine up-stroke wires + "take the block apart and pack it" + "must run as
+an oscillator from a blank tape" gives exactly the champion (and its twin).
+
+What this is not: the nine up-stroke wires were given, not derived. Whether
+they are the only up-stroke that can be completed this way is not known.
+
 ### One try at finding another oscillator
 
 Files: `src/10_down_stroke.c`, `src/11_oscillator.c`, `src/12_signature.c`
