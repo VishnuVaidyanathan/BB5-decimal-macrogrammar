@@ -261,7 +261,8 @@ Not done:
       maps only; 343 maps were too irregular for it.
 - [x] Why the champion is tall (section 11): a stack of counters and a swap
       move, not a clever gate.
-- [ ] A design with the swap move (section 11, the new contract).
+- [x] A design with the swap move (section 12): 13 wires, works on prepared tapes.
+- [ ] The same with a restart and a halt inside 14 wires (one wire short now).
 - [ ] Any proof. Nothing in this folder is proved in Coq.
 
 Limits of the searches (so nobody over-reads them):
@@ -511,7 +512,105 @@ stop at 10^328.
     1^P  gap4  1^Z  rest   ->   1^s  gap2  1^(3P+c')  gap2  1^(Z-2)  rest  (swap)
     a counter at 0 joins its gaps
 
-## 12. Credits
+## 12. The swap move: found, and one wire short
+
+Files: `src/9_swap.c`, `src/ladder.c`, `src/canon.c`, `src/wire_use.c`
+
+### The search
+
+Seeds: the 71 Engine+Fuel machines whose fuel is a solid counter block
+(`results/counter_block_seeds.txt`). They already do the first line of the
+contract (gap a: triple, counter − 1). We add wires for the second line:
+
+    [A] 0^g 1^P 0^(2a) 1^Z   ->   [A] 0^g 1^s 0^a 1^N 0^a 1^(Z-1)
+
+with s small and N growing with P.
+
+| Added wires | Total | Found |
+|---|---|---|
+| 3 | 12 | 0 |
+| 4 | 13 | 64 |
+
+List: `results/swap_machines_13wires.txt`.
+
+### It works as a ladder (on prepared tapes)
+
+Machine `0LB0LA_1RB1RC_1RD1LA_1RF0LE_0RC1LE_---0LG_1LC1LG`
+(tape written as block sizes, gaps in brackets):
+
+| Start tape | Result |
+|---|---|
+| `2 (1) 1` | halts, 23 ones |
+| `2 (1) 2` | halts, 68 ones |
+| `2 (1) 3` | halts, 203 ones (×3 per counter unit) |
+| `1 (2) 1` | halts at step 448,431 with 1,094 ones = (3^7 + 1)/2 |
+| `2 (2) 1` | halts at step 326,886,086 with 29,525 ones = (3^10 + 1)/2 |
+| `1 (2) 2` | still running at 2 × 10^10 steps, on its way to about 3^1094 |
+
+A step-by-step view (`canon`), start `1 (2) 2`:
+
+    1 (2) 2
+    1 (1) 5 (1) 1          <- swap: new P = 1, old block is now a counter of 5
+    4 (1) 4 (1) 1
+    13 (1) 3 (1) 1
+    40 (1) 2 (1) 1
+    121 (1) 1 (1) 1
+    364 (2) 1              <- counter empty: the gaps joined into a double gap
+    1 (1) 1094             <- swap again: 364 became a counter of 1094
+    4 (1) 1093 ...
+
+So in these machines: **gap 1 = triple, gap 2 = swap, gap 3 = halt.**
+The second counter counts exponentiations, as in the champion.
+
+### From a blank tape: nothing
+
+All 64 machines, from every start state: 296 runs halt within 22 steps, the
+other 152 run off to one side filling ones. They have 13 wires and one halt
+wire. Nothing is left to make the first counters.
+
+### Filling the last wire: a tower from blank, but no halt
+
+We filled the halt wire in all 28 ways and ran from blank (12,544 runs).
+Some now build counters by themselves. Example
+`1RB1LA_0LC0LB_1RC1RD_1RE1LB_1RF0LA_1LF0LG_0RE1LG`, start A, blank tape:
+
+    step 18           2 (2) 1
+    step 46           2 (1) 5
+    step 89,339       486                 <- everything used up
+    step 799,395      2 (1) 1456 (1) 1    <- RESTART: 486 became a counter of 1456
+    step 581,989,164  39366 (1) 1447 (1) 1 ...
+
+So the filled wire acts as a **restart**: a finished block Q becomes a counter
+of about 3Q. That is a tower growing forever from a blank tape. But with all
+14 wires used it can never halt.
+
+In 542 of these runs the swap wire `F1` is never used (there is never a second
+counter), so triple + restart alone need only 11 to 13 wires.
+
+### Where this stands
+
+| Part | Wires |
+|---|---|
+| Loop + counter (triple) | 9 |
+| Swap | 4 |
+| Restart (makes the first counters from blank) | 1 |
+| Halt | 1 |
+| **Total** | **15** |
+
+We have 14. **We are one wire short.** The champion fits the same jobs into
+14 by letting its restart reuse the wires of its move.
+
+Ways forward:
+
+1. A cheaper swap. A looser version of the contract gives candidates with 10
+   and 11 wires (`results/loose_swap_candidates_unchecked.txt`). The few we
+   looked at use a different tape code (P stored as separated single ones) and
+   have **not** been checked as ladders.
+2. A cheaper triple (the 8-wire machine uses `110` units, not a block, so it
+   cannot be swapped as it is).
+3. Let the restart share wires with the swap, as the champion does.
+
+## 13. Credits
 
 The BB(7) machine that started this is Jeff Ketchersid's. The method of
 reading a table as parts with jobs came out of the transcript-grammar work in
