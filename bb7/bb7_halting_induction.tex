@@ -12,7 +12,7 @@
 \newcommand{\too}{\;\Longrightarrow^{*}\;}
 \title{Why the Claimed BB(7) Champion Halts:\\ the Induction, Written Out on Paper}
 \author{Vishnu Vaidyanathan\\ \small Independent researcher\\ \small \texttt{vishnu@edgi.in}}
-\date{12 November 2026 \\ \small working note, not yet proved in Coq}
+\date{12 November 2026 \\ \small working note; the halting part is now proved in Coq (\texttt{BB7Halts.v})}
 \begin{document}
 \maketitle
 
@@ -26,7 +26,9 @@ What was missing is a proof that the run uses only these rules until the end.
 This note gives that proof on paper. It is an induction on the gap width. It also
 gives the exact value of the last block as a ladder of functions $G_1,G_2,\dots$
 The argument is checked by computer on every case small enough to compute.
-It is the plan for a Coq proof; it is not one yet.
+The halting part has since been proved in Coq (\texttt{BB7Halts.v}, no axioms):
+the machine halts from a blank tape. The exact value of the last block is still
+a paper result.
 \end{abstract}
 
 \section{What is already proved}
@@ -279,30 +281,45 @@ No case with two or more units can be run to the end; the numbers are too large.
 \section{What is proved and what is not}
 
 \begin{itemize}
-\item Proved in Coq already: the start, the move for every width, the gate.
-\item Proved on paper here: Lemmas \ref{even}--\ref{big}, Theorem~\ref{main},
-Corollary~\ref{champ}.
-\item Not yet in Coq: everything in this note. Until it is, the halting of the
-machine is a paper argument with computer checks, not a verified result.
-\item Not done at all: the halting time, the number of ones left, and a
+\item \textbf{Proved in Coq} (\texttt{BB7Moves.v}, \texttt{BB7Halts.v}, Coq 8.18,
+no axioms): the start, the move for every width, the gate, the consume lemma for
+widths $1$ to $199$ (as ``the counter is used up, the next gap grows by $2j$, and
+the new block is even and large enough''), and
+\[
+\texttt{champion\_halts}:\quad \exists n,\ \text{the machine started on a blank
+tape is in the halt state after } n \text{ steps.}
+\]
+Also \texttt{champion\_gate}: the run reaches one block, a gap of $42$ cells
+(width $21$) and the last $1$.
+\item \textbf{Proved on paper only}: the exact values, that is, that the new
+block after a consume is $G_j^{\,Z/2}(P)$ and that the last block is
+$G_{20}(\cdots G_2(16))$. The Coq proof shows the block exists, is even and is
+at least $132$; it does not name it.
+\item The Coq version of Theorem~\ref{main} (\texttt{units\_halt}) asks for
+$P_0\ge 12$ instead of $P_0\ge 2$. The champion has $P_0=16$.
+\item \textbf{Not done}: the halting time, the number of ones left, and a
 comparison with the claimed bound.
 \item We do not know whether this argument is already known to the discoverer
 or to others.
 \end{itemize}
 
-\section{Plan for Coq}
+\section{How the Coq proof is arranged}
 
 \begin{enumerate}
-\item Define clean tapes from a list of (gap, counter) pairs, and restate
-\texttt{move} as the four cases T, T$'$, S, S$'$.
-\item Define $G_j$ and $p_k$ by recursion on $j$.
-\item Prove Lemma~\ref{even} and Lemma~\ref{big}.
-\item Prove Lemma~\ref{consume} by induction on $j$, with an inner induction on
-$Z$ for the rounds and an inner induction on $k$ for the planted counters.
-\item Prove Theorem~\ref{main} by induction on the number of units, then
-Corollary~\ref{champ} from \texttt{start} and \texttt{halts\_gen}.
+\item Numbers are written by their halves: the working block is $2q$ ones and a
+counter is $2h+2$ ones. Then ``even'' needs no side condition.
+\item \texttt{consume1}: width $1$, by induction on $h$.
+\item \texttt{planted}: a row of $t$ units behind a gap of width $a+1$ is used
+up at widths $a+1,\dots,a+t$, given the consume lemma for those widths.
+\item \texttt{round}: one round at width $j\ge 2$: the move, then
+\texttt{planted} for the $j-2$ planted units, then the consume lemma at width
+$j-1$ for the big counter.
+\item \texttt{consume\_all}: all widths up to $199$, by induction on the width
+with an inner induction on $h$.
+\item \texttt{units\_to\_gate}: \texttt{planted} once more, now for the 19 real
+units ($a=1$). Then \texttt{halts\_gen} gives \texttt{champion\_halts}.
 \end{enumerate}
-The statement of step 4 should carry a free rest-of-tape $T$, as the move
-theorem already does, so that the lemma can be used inside itself.
+Every lemma carries a free rest-of-tape, as the move theorem does. That is what
+lets the consume lemma be used inside itself.
 
 \end{document}

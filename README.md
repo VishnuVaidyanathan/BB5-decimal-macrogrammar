@@ -62,9 +62,9 @@ The tape rules there are the work of mxdys; this repo adds the step counts.
 ## BB(7)
 
 The same method on the claimed BB(7) champion: a grammar that writes its
-digits without running the machine, and a Coq proof of its one move and of
-the halting gate. See [`bb7/`](bb7/). The machine is due to Jeff Ketchersid;
-its bound is not verified here.
+digits without running the machine, and a Coq proof (`bb7/BB7Halts.v`, no
+axioms) that the machine halts from a blank tape. See [`bb7/`](bb7/). The
+machine is due to Jeff Ketchersid; its bound is not verified here.
 
 Work in progress: `bb7/design/` has notes and code for designing a BB(7)
 machine from parts (loop, fuel, gate, restart). See `bb7/design/README.md`.

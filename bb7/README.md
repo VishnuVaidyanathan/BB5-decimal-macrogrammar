@@ -1,12 +1,13 @@
-# Claimed BB(7) champion: a transcript grammar, and a Coq proof of its move
+# Claimed BB(7) champion: a transcript grammar, and a Coq proof that it halts
 
 Machine (found by Jeff Ketchersid, October 2026; the BusyBeaverWiki lists its
 bound as not independently verified):
 
     1RB0RG_1RC1RB_0RD1RZ_0LE0LD_0LF1LE_1RA1LF_1LC0RB
 
-This folder does **not** verify the claimed bound and does **not** prove that
-the machine halts. It describes what the run is made of, and proves the pieces.
+This folder describes what the run is made of, and proves in Coq that the
+machine **halts** from a blank tape (`BB7Halts.v`, see below). It does **not**
+verify the claimed bound, and it does not give the halting time.
 
 ## In short
 
@@ -58,8 +59,9 @@ The step in `tripling_chain` is `5656 + chcost 25 12`, which is
 
 ## Not proved
 
-- That the run stays inside the rule (`m >= 1`) until the end. Without this
-  there is no proof of halting and no exact halting time.
+- (Now proved in `BB7Halts.v`: the run stays inside the rule until the gate,
+  and the machine halts.)
+- The exact halting time and the number of ones left.
 - The restart for general odd `P`.
 - The digit strings themselves (the step counts equal their lengths).
 - The claimed bound.
@@ -97,30 +99,46 @@ versions of the real tape (the real one has 19 units after the restart):
 `check_wide_gaps.py`: the move word W(P, j) and the halt word H(P, j) match
 the machine digit for digit for every j from 1 to 21 (63 of 63 each).
 
-**Not done:** the real 19-unit case has about 2.3 billion shapes by the
-pattern, too many to list. So for 19 units this is a pattern from 12 complete
-cases plus the argument above, not a finished check. An induction on the
-number of units would close it.
+The real 19-unit case has about 2.3 billion shapes by the pattern, too many to
+list this way. The induction that closes it is in `BB7Halts.v` (next section).
 
-## The halting induction, on paper
+## The machine halts (proved in Coq)
 
-`bb7_halting_induction.tex` / `.pdf` (5 pages) gives the missing step as a
-paper proof: the run uses only the move rule until the gate, so the machine
-halts. It is an induction on the gap width, and it gives the last block as a
-ladder of functions:
+`BB7Halts.v` (Coq 8.18, standard library only, no axioms; needs `BB7Moves.v`):
+
+    Theorem champion_halts : exists n, state (steps n c0) = Hlt.
+
+`c0` is the blank tape in state A. So the claimed BB(7) champion halts.
+
+    coqc BB7Moves.v      # about 7 seconds
+    coqc BB7Halts.v      # about 2 seconds, prints "Closed under the global context"
+
+| Theorem | What it says |
+|---|---|
+| `consume` | for gap widths 1 to 199: a counter behind the gap is used up, the next gap grows by 2j, and the new block is even and large enough |
+| `units_halt` | a clean tape with an even block of at least 12, a double gap, 1 to 197 units and the last 1 halts |
+| `champion_gate` | from a blank tape the run reaches one block, a gap of 42 cells (width 21) and the last 1 |
+| `champion_halts` | from a blank tape the machine halts |
+
+The proof is an induction on the gap width. `bb7_halting_induction.pdf`
+(5 pages) explains it in plain words and also gives the last block as a ladder
+of functions:
 
     G_1(P) = 3P + 6
     G_j(P) = G_(j-1) applied (3P + 8 - 2j)/2 times to p_(j-1)
     p_1 = 2,  p_k = G_(k-1)(p_(k-1))
     last block = G_20(G_19(... G_2(16)))
 
-`check_induction.py` tests it: the consume lemma against the exact rules
-(10 of 10 small cases), and the whole theorem against the real machine for
-one-unit tapes (halts at step 18,310,165 and at step 13,318,711,129, exactly
-as predicted). `run_tape.c` is the fast machine run it uses.
+What is **not** in Coq: the exact value of the last block (the formula above is
+proved on paper and tested by `check_induction.py`), the halting time, the
+number of ones left, and any comparison with the claimed bound. We also do not
+know whether this proof is already known to the discoverer or to others.
 
-This is **not yet proved in Coq**. Until it is, the halting of the machine is
-a paper argument with computer checks.
+`check_induction.py` tests the paper formulas: the consume lemma against the
+exact rules (10 of 10 small cases), and the whole theorem against the real
+machine for one-unit tapes (halts at step 18,310,165 and at step
+13,318,711,129, exactly as predicted). `run_tape.c` is the fast machine run it
+uses.
 
 ## Next: designing a machine from parts
 
