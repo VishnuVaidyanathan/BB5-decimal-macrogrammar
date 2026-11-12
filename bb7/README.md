@@ -64,6 +64,44 @@ The step in `tripling_chain` is `5656 + chcost 25 12`, which is
 - The digit strings themselves (the step counts equal their lengths).
 - The claimed bound.
 
+## Is the grammar closed?
+
+Closed means: every tape shape the run can reach is covered by one of the
+rules (move, restart, halt), so the digits can be written without the machine
+all the way to the end.
+
+`check_closure.py` follows shapes instead of numbers (the numbers become far
+too large). It uses only what the rules look at: the gap, whether a counter is
+1, 2 or more, and whether P is large enough for the gap. Run for smaller
+versions of the real tape (the real one has 19 units after the restart):
+
+| Units | Shapes reached | Widest gap j | Ends in | Shapes with no rule |
+|---|---|---|---|---|
+| 1 | 4 | 2 | halt, j = 3 | none |
+| 2 | 15 | 3 | halt, j = 4 | none |
+| 3 | 50 | 4 | halt, j = 5 | none |
+| 6 | 1,451 | 7 | halt, j = 8 | none |
+| 9 | 39,356 | 10 | halt, j = 11 | none |
+| 12 | 1,062,869 | 13 | halt, j = 14 | none |
+
+(All values from 1 to 12 were run; the pattern is the same in each.)
+
+- Every version is closed, and each ends in exactly one halt.
+- The widest gap is always units + 1, and the halt comes at units + 2.
+  For the real run that is j = 20 and a halt at j = 21.
+- P = 2 only ever meets gap 2. P = 12 only meets gap 4. Every wider gap is
+  met by P of at least 42, which is enough for gaps up to j = 64.
+- After the one restart P is always even and every counter except the last 1
+  is even, so the restart never fires again and the last 1 gives the halt.
+
+`check_wide_gaps.py`: the move word W(P, j) and the halt word H(P, j) match
+the machine digit for digit for every j from 1 to 21 (63 of 63 each).
+
+**Not done:** the real 19-unit case has about 2.3 billion shapes by the
+pattern, too many to list. So for 19 units this is a pattern from 12 complete
+cases plus the argument above, not a finished check. An induction on the
+number of units would close it.
+
 ## Next: designing a machine from parts
 
 `design/` holds working notes and search code for building a BB(7) machine
