@@ -1,0 +1,308 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newcommand{\st}[2]{\bigl(#1 \mid #2\bigr)}
+\newcommand{\too}{\;\Longrightarrow^{*}\;}
+\title{Why the Claimed BB(7) Champion Halts:\\ the Induction, Written Out on Paper}
+\author{Vishnu Vaidyanathan\\ \small Independent researcher\\ \small \texttt{vishnu@edgi.in}}
+\date{12 November 2026 \\ \small working note, not yet proved in Coq}
+\begin{document}
+\maketitle
+
+\begin{abstract}\sloppy
+The machine \texttt{1RB0RG\_\allowbreak 1RC1RB\_\allowbreak 0RD1RZ\_\allowbreak 0LE0LD\_\allowbreak 0LF1LE\_\allowbreak 1RA1LF\_\allowbreak 1LC0RB}
+(found by Jeff Ketchersid) is listed as the BB(7) champion, with the claim marked
+as not independently verified. In earlier notes we proved in Coq that the machine
+reaches a clean tape with 19 units, that one \emph{move} rule describes each
+macro step for every gap width, and that a \emph{gate} rule halts the machine.
+What was missing is a proof that the run uses only these rules until the end.
+This note gives that proof on paper. It is an induction on the gap width. It also
+gives the exact value of the last block as a ladder of functions $G_1,G_2,\dots$
+The argument is checked by computer on every case small enough to compute.
+It is the plan for a Coq proof; it is not one yet.
+\end{abstract}
+
+\section{What is already proved}
+
+A \emph{clean tape} is written
+\[
+\st{P}{(g_1,Z_1),(g_2,Z_2),\dots,(g_r,Z_r)} .
+\]
+It means: a block of $P$ ones, then $g_1$ zeros, then a block of $Z_1$ ones, then
+$g_2$ zeros, and so on, with the head in state G at the left of the first block.
+We call $P$ the \emph{working block}, each $Z_i$ a \emph{counter}, and each $g_i$
+a \emph{gap}. A gap of $2j$ cells is said to have \emph{width} $j$.
+
+Three facts are proved in \texttt{BB7Moves.v}.
+
+\begin{description}
+\item[Start (\texttt{start}).] From a blank tape, after 3{,}954 steps the tape is
+$\st{16}{(4,2),\,(2,2)^{18},\,(2,1)}$. Here $(2,2)^{18}$ means eighteen copies.
+So there are 19 counters equal to $2$ (the \emph{units}) and a last counter $1$.
+
+\item[Move (\texttt{move}).] Let the first gap have width $j\ge 1$ and let
+$m=3P+3-2j$. If $m\ge 1$ and $Z\ge 2$, then
+\[
+\underbrace{1^{P}\;0^{2j}\;1^{Z}\;R}_{\text{before}}
+\quad\longrightarrow\quad
+\underbrace{(1100)^{\,j-1}\;1^{N}\;00\;1^{Z-2}\;R}_{\text{after}},
+\qquad N=3P+8-2j .
+\]
+$R$ is any rest of the tape. We say the move is \emph{in range} when $m\ge 1$.
+
+\item[Gate (\texttt{halts\_gen}).] If the tape is $\st{P}{(2j,1)}$ with nothing
+after the last $1$, and $m=3P+3-2j$ is odd and at least $1$, the machine halts.
+\end{description}
+
+\section{The move, read on clean tapes}
+
+Reading the move rule in the clean-tape notation gives four cases. Let $T$ be
+any list of (gap, counter) pairs and $N=3P+8-2j$.
+
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Case & Before & After \\
+\midrule
+\textbf{T} (triple), $j=1$, $Z\ge 4$ & $\st{P}{(2,Z),T}$ & $\st{3P+6}{(2,Z-2),T}$ \\
+\textbf{T$'$} (counter ends), $j=1$, $Z=2$ & $\st{P}{(2,2),(g,X),T}$ & $\st{3P+6}{(g+2,X),T}$ \\
+\textbf{S} (swap), $j\ge 2$, $Z\ge 4$ & $\st{P}{(2j,Z),T}$ & $\st{2}{(2,2)^{j-2},(2,N),(2,Z-2),T}$ \\
+\textbf{S$'$} (counter ends), $j\ge 2$, $Z=2$ & $\st{P}{(2j,2),(g,X),T}$ & $\st{2}{(2,2)^{j-2},(2,N),(g+2,X),T}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+In words. With a single gap the working block triples. With a wider gap the
+tripled block becomes a new counter $N$, a fresh working block of $2$ is planted,
+and $j-2$ extra counters of $2$ are planted between them. When a counter is used
+up, its two gaps join into one wider gap.
+
+\begin{lemma}[Even numbers]\label{even}
+If $P$ is even and every counter except possibly the last is even, the same is
+true after any move.
+\end{lemma}
+\begin{proof}
+$3P+6$ is even. $N=3P+8-2j$ is even. The planted values are $2$. $Z-2$ is even.
+\end{proof}
+
+After the start, $P=16$ and the counters are $2,\dots,2,1$. So from now on
+\emph{$P$ is always even, every counter but the last is even, and the last
+counter stays $1$ and stays last.}
+
+\section{The ladder functions}
+
+\begin{definition}\label{G}
+For even $P$ define
+\[
+G_1(P)=3P+6,\qquad
+G_j(P)=G_{j-1}^{\,(3P+8-2j)/2}\bigl(p_{j-1}\bigr)\quad (j\ge 2),
+\]
+where $f^{\,n}$ means ``apply $f$ $n$ times'', and the constants $p_k$ are
+\[
+p_1=2,\qquad p_{k}=G_{k-1}(p_{k-1})\quad(k\ge 2).
+\]
+\end{definition}
+
+So $p_2=12$, $p_3=G_2(12)=G_1^{20}(2)=5\cdot 3^{20}-3$, and for example
+$G_2(P)=G_1^{(3P+4)/2}(2)=5\cdot 3^{(3P+4)/2}-3$.
+$G_1$ is linear, $G_2$ is an exponential, $G_3$ is a tower of exponentials, and
+each further $G_j$ is one level higher.
+
+\section{The consume lemma}
+
+\begin{lemma}[Consume]\label{consume}
+Let $1\le j\le 199$. Let $P$ and $Z$ be even, $Z\ge 2$, and let the first move be
+in range ($3P+3-2j\ge 1$). Then for every next pair $(g,X)$ and every $T$,
+\[
+\st{P}{(2j,Z),\,(g,X),\,T}\;\too\;\st{G_j^{\,Z/2}(P)}{(g+2j,\,X),\,T},
+\]
+and every move used on the way is in range.
+\end{lemma}
+
+In words: a counter $Z$ behind a gap of width $j$ is used up completely; the
+working block becomes $G_j$ applied $Z/2$ times; and the next gap grows by $2j$.
+
+\begin{proof}
+By induction on $j$.
+
+\emph{$j=1$.} Apply case T $(Z-2)/2$ times, then case T$'$ once. Each
+application replaces $P$ by $3P+6=G_1(P)$, and the last one joins the gaps to
+$g+2$. Every move has gap width $1$ and $P\ge 2$, so $m=3P+1\ge 7$.
+
+\emph{$j\ge 2$.} We show one \emph{round}:
+\begin{equation}\label{round}
+\st{P}{(2j,Z),\dots}\;\too\;
+\begin{cases}
+\st{G_j(P)}{(2j,Z-2),\dots} & Z\ge 4,\\[2pt]
+\st{G_j(P)}{(g+2j,X),T} & Z=2.
+\end{cases}
+\end{equation}
+Repeating the round $Z/2$ times gives the lemma.
+
+The first move is case S or S$'$. It gives
+\[
+\st{2}{(2,2)^{j-2},\,(2,N),\,E,\dots},\qquad N=3P+8-2j,
+\]
+where $E=(2,Z-2)$ if $Z\ge 4$ and $E=(g+2,X)$ if $Z=2$.
+
+\emph{The planted counters.} The working block is $p_1=2$ and it meets a
+counter $2$ behind a gap of width $1$. By the lemma for width $1$ the block
+becomes $G_1(p_1)=p_2$ and the next gap becomes $2+2=4$. Now $p_2$ meets a
+counter $2$ behind a gap of width $2$; by the lemma for width $2$ the block
+becomes $p_3$ and the next gap becomes $6$. Going on like this, the $k$-th
+planted counter is met by $p_k$ behind a gap of width $k$, for $k=1,\dots,j-2$,
+and after all of them the tape is
+\[
+\st{p_{j-1}}{(2(j-1),N),\,E,\dots} .
+\]
+
+\emph{The big counter.} By the lemma for width $j-1$ applied to the counter $N$,
+the block becomes $G_{j-1}^{\,N/2}(p_{j-1})$, which is $G_j(P)$ by
+Definition~\ref{G}, and the gap in front of $E$ grows by $2(j-1)$. If
+$E=(2,Z-2)$ the new gap is $2j$. If $E=(g+2,X)$ the new gap is $g+2j$. This is
+\eqref{round}.
+
+\emph{Range.} We must check $3P'+3-2j'\ge 1$ for each working block $P'$ that
+meets a gap of width $j'$:
+\begin{itemize}
+\item $p_1=2$ meets width $1$: $m=7$.
+\item $p_2=12$ meets width $2$: $m=35$.
+\item $p_k$ with $k\ge 3$ meets width $k$. By Lemma~\ref{big} below
+$p_k\ge 132$, so $m\ge 399-2k\ge 1$ because $k\le 199$.
+\item After a round, $G_j(P)$ meets width $j$ again. By Lemma~\ref{big},
+$G_j(P)\ge 132$, so again $m\ge 1$.
+\end{itemize}
+Also $N=m+5\ge 6$, so $N$ is an even counter with $N/2\ge 3$.
+\end{proof}
+
+\begin{lemma}[Blocks are big enough]\label{big}
+For $j\ge 2$, whenever the first move is in range, $G_j(P)\ge 132$.
+Hence $p_k\ge 132$ for $k\ge 3$.
+\end{lemma}
+\begin{proof}
+$G_j(P)=G_{j-1}^{\,n}(p_{j-1})$ with $n=N/2\ge 3$. For $j=2$ this is
+$G_1^{\,n}(2)\ge G_1^{3}(2)=132$, since $G_1$ is increasing and $G_1(x)>x$.
+For $j\ge 3$ the last of the $n$ applications is a value of $G_{j-1}$ on an
+in-range block, which is at least $132$ by induction.
+\end{proof}
+
+\begin{remark}
+Lemmas \ref{consume} and \ref{big} refer to each other. They are proved together
+by one induction on $j$: the proof for width $j$ uses both lemmas only for
+smaller widths, and Lemma~\ref{big} for width $j$ itself only after the first
+round of width $j$ is done.
+\end{remark}
+
+\begin{remark}
+The bound $j\le 199$ is only there because Lemma~\ref{big} uses the crude number
+$132$. The blocks are in fact far larger. The real run needs widths up to $21$.
+\end{remark}
+
+\section{The theorem}
+
+\begin{theorem}\label{main}
+Let $1\le u\le 197$ and let $P_0\ge 2$ be even. Define
+\[
+Q_0=P_0,\qquad Q_k=G_{k+1}(Q_{k-1})\quad(k=1,\dots,u).
+\]
+Then the machine, started on the clean tape
+$\st{P_0}{(4,2),\,(2,2)^{u-1},\,(2,1)}$, uses only in-range moves, reaches
+\[
+\st{Q_u}{(2(u+2),\,1)},
+\]
+and halts there.
+\end{theorem}
+\begin{proof}
+The first unit is behind a gap of width $2$. By Lemma~\ref{consume} with $j=2$
+and $Z=2$ it is used up, the block becomes $G_2(Q_0)=Q_1$, and the gap of the
+second unit grows from $2$ to $6$, width $3$. By the lemma with $j=3$ the block
+becomes $Q_2$ and the third unit's gap becomes $8$. In general the $k$-th unit
+is met by $Q_{k-1}$ behind a gap of width $k+1$, and is used up by the lemma
+with $j=k+1$. The first moves are in range: $Q_0\ge 2$ meets width $2$
+($m=3P_0-1\ge 5$), and $Q_k\ge 132$ for $k\ge 1$.
+
+After the last unit the tape is $\st{Q_u}{(2(u+2),1)}$. $Q_u$ is even by
+Lemma~\ref{even}, so $m=3Q_u+3-2(u+2)$ is odd, and it is at least $1$ because
+$Q_u\ge 132$. The gate rule applies and the machine halts.
+\end{proof}
+
+\begin{corollary}[The champion]\label{champ}
+The machine halts from a blank tape. The widest gap in a move is of width $20$,
+the halt is at width $21$, and the last working block is
+\[
+Q_{19}=G_{20}\bigl(G_{19}(\cdots G_3(G_2(16))\cdots)\bigr).
+\]
+\end{corollary}
+\begin{proof}
+The start rule gives the tape of Theorem~\ref{main} with $P_0=16$ and $u=19$.
+\end{proof}
+
+The first value is $Q_1=G_2(16)=5\cdot 3^{26}-3=12{,}709{,}329{,}141{,}642$.
+The second, $Q_2=G_3(Q_1)$, is $G_2$ applied
+$19{,}063{,}993{,}712{,}464$ times to $12$: a tower of that many
+exponentials. We do not work out a closed bound here. The claimed bound of the
+form $3\uparrow^{20}3$ has the same shape as a ladder with twenty levels, but
+comparing the two is left for later.
+
+\section{Computer checks}
+
+All of these are in the repository, in \texttt{bb7/}.
+
+\begin{center}
+\begin{tabular}{@{}p{0.5\textwidth}p{0.42\textwidth}@{}}
+\toprule
+Check & Result \\
+\midrule
+Move and halt words against the machine, digit for digit, widths $1$ to $21$
+(\texttt{check\_wide\_gaps.py}) & 63 of 63 and 63 of 63 match \\
+Every shape reachable with $1$ to $12$ units (\texttt{check\_closure.py}) &
+no shape without a rule; widest move $u+1$; one halt, at width $u+2$ \\
+Lemma~\ref{consume} against the exact rules, ten small cases
+(\texttt{check\_induction.py}) & 10 of 10 agree (values up to 23{,}478 digits) \\
+Theorem~\ref{main} with $u=1$ against the real machine & $P_0=2$: halts at step
+18{,}310{,}165 as predicted, last block $1212=G_2(2)$.\quad $P_0=4$: halts at step
+13{,}318{,}711{,}129 as predicted, last block $32802=G_2(4)$ \\
+$Q_1$ and the counter $3Q_1+2$ against the macro run & both equal \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+No case with two or more units can be run to the end; the numbers are too large.
+
+\section{What is proved and what is not}
+
+\begin{itemize}
+\item Proved in Coq already: the start, the move for every width, the gate.
+\item Proved on paper here: Lemmas \ref{even}--\ref{big}, Theorem~\ref{main},
+Corollary~\ref{champ}.
+\item Not yet in Coq: everything in this note. Until it is, the halting of the
+machine is a paper argument with computer checks, not a verified result.
+\item Not done at all: the halting time, the number of ones left, and a
+comparison with the claimed bound.
+\item We do not know whether this argument is already known to the discoverer
+or to others.
+\end{itemize}
+
+\section{Plan for Coq}
+
+\begin{enumerate}
+\item Define clean tapes from a list of (gap, counter) pairs, and restate
+\texttt{move} as the four cases T, T$'$, S, S$'$.
+\item Define $G_j$ and $p_k$ by recursion on $j$.
+\item Prove Lemma~\ref{even} and Lemma~\ref{big}.
+\item Prove Lemma~\ref{consume} by induction on $j$, with an inner induction on
+$Z$ for the rounds and an inner induction on $k$ for the planted counters.
+\item Prove Theorem~\ref{main} by induction on the number of units, then
+Corollary~\ref{champ} from \texttt{start} and \texttt{halts\_gen}.
+\end{enumerate}
+The statement of step 4 should carry a free rest-of-tape $T$, as the move
+theorem already does, so that the lemma can be used inside itself.
+
+\end{document}

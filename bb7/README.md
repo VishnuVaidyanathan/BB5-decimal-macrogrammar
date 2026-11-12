@@ -102,6 +102,26 @@ pattern, too many to list. So for 19 units this is a pattern from 12 complete
 cases plus the argument above, not a finished check. An induction on the
 number of units would close it.
 
+## The halting induction, on paper
+
+`bb7_halting_induction.tex` / `.pdf` (5 pages) gives the missing step as a
+paper proof: the run uses only the move rule until the gate, so the machine
+halts. It is an induction on the gap width, and it gives the last block as a
+ladder of functions:
+
+    G_1(P) = 3P + 6
+    G_j(P) = G_(j-1) applied (3P + 8 - 2j)/2 times to p_(j-1)
+    p_1 = 2,  p_k = G_(k-1)(p_(k-1))
+    last block = G_20(G_19(... G_2(16)))
+
+`check_induction.py` tests it: the consume lemma against the exact rules
+(10 of 10 small cases), and the whole theorem against the real machine for
+one-unit tapes (halts at step 18,310,165 and at step 13,318,711,129, exactly
+as predicted). `run_tape.c` is the fast machine run it uses.
+
+This is **not yet proved in Coq**. Until it is, the halting of the machine is
+a paper argument with computer checks.
+
 ## Next: designing a machine from parts
 
 `design/` holds working notes and search code for building a BB(7) machine
