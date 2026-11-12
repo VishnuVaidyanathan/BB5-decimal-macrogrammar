@@ -25,6 +25,7 @@ Digit map: digit = 2 * state_index + symbol (A0=0, A1=1, ..., E1=9).
 | `M_sequence` | M = 1, 3, 6, 12, 22, 39, 66, 112, 189, 316, 529, 883, 1473, 2456, 4095 |
 | `bb5_champion_halts` | from a blank tape the machine halts (after 15 layers) |
 | `bb5_decimal_trace` | **the whole decimal trace is exactly `0246` followed by the layer grammar** |
+| `bb5_steps_from_grammar` | the number of steps is 4 + the length of the grammar |
 
 ## Check it yourself
 

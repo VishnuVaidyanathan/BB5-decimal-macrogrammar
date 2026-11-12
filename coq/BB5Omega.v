@@ -842,3 +842,22 @@ Proof.
   - f_equal. lia.
   - f_equal. lia.
 Qed.
+
+(* ---------- The step count is the length of the grammar ----------
+   trace n c has exactly n digits, so the number of steps in the main
+   theorem is 4 + the length of the layer grammar.                     *)
+
+Lemma trace_length : forall n c, length (trace n c) = n.
+Proof.
+  induction n as [| n IH]; intros c; simpl; [reflexivity | now rewrite IH].
+Qed.
+
+Corollary bb5_steps_from_grammar :
+  exists n, state (steps n (A, [], false, [])) = Z
+            /\ trace n (A, [], false, []) = [0; 2; 4; 6] ++ grammar 20 2
+            /\ n = 4 + length (grammar 20 2).
+Proof.
+  destruct bb5_decimal_trace as [n [Hs Ht]].
+  exists n. split; [exact Hs | split; [exact Ht |]].
+  rewrite <- (trace_length n (A, [], false, [])), Ht, app_length. reflexivity.
+Qed.
