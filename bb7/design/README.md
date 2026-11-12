@@ -677,6 +677,31 @@ each box had its own wire to ask "is anything on the right?".
 At the bottom, state G reads 0 instead of 1 (digit c instead of d). That starts
 the Wait loop, which packs `1 0 1 0` into `11 00`. Then it goes up again.
 
+### Checking the oscillator reading on the real run
+
+File: `src/13_oscillator_check.c` (`gcc -O2 -o chk 13_oscillator_check.c && ./chk 60000000`)
+
+A "look" is state D reading a cell right after B0, C0. At each look we measure
+the working block (the solid run of ones ending where B just wrote) and the
+trail of ones on its left, and compare with the next look.
+First 60,000,000 steps from a blank tape:
+
+| D read | Prediction | Looks | Exactly as predicted | Different |
+|---|---|---|---|---|
+| 1 | up: block +3 | 7,739 | 7,718 | 21 |
+| 0 | down: block −1, trail +1 | 78 | 75 | 3 |
+
+The 24 differences are all of two kinds:
+
+- 13 have a bottom turn (G reads 0) between the two looks, so the next look is
+  on a new block. Expected.
+- 11 are "block +4, trail −1": the block gains its 3 and also swallows one
+  trail cell that was touching it. This happens once per move, at the first
+  up-stroke after a down phase.
+
+No other case occurs. So in 7,817 looks the rule "1 ahead = up, 0 ahead = down"
+never fails; it only needs the two footnotes above.
+
 ### One try at finding another oscillator
 
 Files: `src/10_down_stroke.c`, `src/11_oscillator.c`, `src/12_signature.c`
