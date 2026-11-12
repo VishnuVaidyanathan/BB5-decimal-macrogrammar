@@ -603,12 +603,37 @@ We have 14. **We are one wire short.** The champion fits the same jobs into
 Ways forward:
 
 1. A cheaper swap. A looser version of the contract gives candidates with 10
-   and 11 wires (`results/loose_swap_candidates_unchecked.txt`). The few we
+   and 11 wires (`results/loose_swap_candidates.txt`). The few we
    looked at use a different tape code (P stored as separated single ones) and
    have **not** been checked as ladders.
 2. A cheaper triple (the 8-wire machine uses `110` units, not a block, so it
    cannot be swapped as it is).
 3. Let the restart share wires with the swap, as the champion does.
+
+### Follow-up: the cheaper candidates are not ladders
+
+File: `src/ladder_check.c`, results in `results/loose_swap_ladder_check.txt`
+
+We tested all 678 loose candidates (10 to 12 wires) with a second counter of
+1, 2 and 3. A real ladder finishes with 1 and explodes with 2. The best
+11-wire candidate, `0LB0LC_1LC1LB_1RD1LA_0RE1RC_1RF0LA_1LE---`, gives
+
+| Second counter | Ones at the end |
+|---|---|
+| 1 | 6,144 |
+| 2 | 24,576 |
+| 3 | 98,304 |
+
+That is ×4 per unit: plain multiplication. These machines are one level lower
+than we need. Their two levels are "add" and "multiply", where ours must be
+"multiply" and "exponentiate". A third counter does not add a level either: it
+is simply merged into the second.
+
+We also checked the idea "let the unused swap wire be the halt". In the 3,222
+blank-tape runs where the swap wire `F1` is unused, the clean tape never has a
+third block waiting, so `F1` would never be reached. No halting machine there.
+
+**So lead 1 is closed. We are still one wire short.** Leads 2 and 3 remain.
 
 ## 13. Credits
 
