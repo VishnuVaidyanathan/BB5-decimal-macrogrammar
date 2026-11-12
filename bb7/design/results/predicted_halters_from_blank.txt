@@ -1,0 +1,154 @@
+height 1 digits of first big block 165 start F 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0LB1LF_0RG0LE_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start F 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0LA1LF_1RG0LE_1LD--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0LB1LF_---0LE_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 1LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1RG0LB_1LD--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0LA1LF_1RG0LE_1LB--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start F 1LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1RG0LB_1LA--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0LB1LF_1RG0LE_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 0LB1LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_0RG0LA_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 1LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_0RG0LB_1LD--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0LA1LF_---0LE_1LB--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start F 0LB1LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_0RG0LA_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start F 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0LA1LF_0RG0LE_1LB--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0LB1LF_0RG0LE_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start F 0LB1LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_1RG0LA_1LE--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start F 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0LB1LF_1RG0LE_1LD--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 0LB1LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_1RG0LA_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start F 1LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_0RG0LB_1LD--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 0LB1LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_---0LA_1LC--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 1LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_---0LB_1LD--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 165 start G 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0LA1LF_0RG0LE_1LB--- doors [11, 689] mod 2 {0: ('H',), 1: ('exp', 3, 9, 3, -1)}
+height 1 digits of first big block 145 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LC0LG_---0LB doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LC1LG_---0RB doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LC1LG_---0RD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LD0LG_---0LC doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LE1LG_---0RA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LB0LG_---0RD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LC1LG_---0RB doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LD0LG_---0LC doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LD1LG_---0RC doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LE0LG_---0RB doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LB0LG_---0RD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LC0LG_---0RE doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LD0LG_---0RE doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LB0LG_---0LA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LB1LG_---0RC doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LC0LG_---0RD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LC1LG_---0RD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LD0LG_---0RA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LE0LG_---0LD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LB1LG_---0RC doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LB1LG_---0RA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LC0LG_---0LB doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LD0LG_---0RA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LD1LG_---0RE doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LB1LG_---0RA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LC0LG_---0RE doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LC1LG_---0RB doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LB0LG_---0RC doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LC1LG_---0RA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LC0LG_---0LB doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LD1LG_---0RE doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LE0LG_---0RA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LB0LG_---0LA doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LC0LG_---0RD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LD1LG_---0RC doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 145 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LE1LG_---0RD doors [1, 11, 605] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 88 start G 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0RB1LF_---0RG_1LC0LD doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 88 start G 1LB1LA_0RC1LF_1RC1RD_1RA1LE_0LC0LE_---0RG_1LD0LA doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 88 start G 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0RA0LF_---1LE_1LB--- doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 88 start G 1LB1LA_0RC0LF_1RC1RD_1RA1LE_0LC0LE_---1LB_1LD--- doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 88 start G 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0RA1LF_---0RG_1LB0LD doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 88 start G 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0RB0LF_---1LE_1LC--- doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 88 start G 0RB0LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_---1LA_1LC--- doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 88 start G 0RB1LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_---0RG_1LC0LE doors [9, 363] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LC1LG_---0RC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LE0LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LA0LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LB0LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LE0LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LC0LG_---0LD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LC1LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LA0LG_---0RE doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LD0LG_---0RE doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LA1LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LB0LG_---0LC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LE0LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LE0LG_---0LA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LA1LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LE1LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LA0LG_---0LB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LD0LG_---0LB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LB1LG_---0RE doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LE1LG_---0RE doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LC0LG_---0RB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LE0LG_---0LA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LA0LG_---0RE doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LB1LG_---0RC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LE1LG_---0RC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LE1LG_---0RC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LA0LG_---0LB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LE0LG_---0LB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LA1LG_---0RB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LD1LG_---0RB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LB0LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LC1LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LE1LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LE0LG_---0RC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LA1LG_---0RB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LE1LG_---0RB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LA0LG_---0LB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LB0LG_---0LC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0LC0LE_1LE0LG_---0LC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LB1LG_---0RE doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LC1LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LC0LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LE1LG_---0RC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0RE0LD_0LA1LE_1LA1LG_---0RB doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LB1LG_---0RC doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0LA1LF_1LC0LG_---0LA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start B 1RA1RB_1RD1LC_0RD0LC_0LE1LD_0LA1LF_1LE1LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LA0LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0LB1LF_1LE0LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LA1LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start C 0LB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LD1LG_---0RD doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start D 0LB1LA_0LC1LF_1RC1RD_1RA1LE_0RA0LE_1LB0LG_---0RE doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 16 start E 0RB0LA_0LC1LB_0LD1LF_1RD1RE_1RB1LA_1LC0LG_---0RA doors [1, 7, 65] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 5)}
+height 1 digits of first big block 14 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0RB1LF_1LA0LG_---0LB doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0RB1LF_1LA1LG_---0RA doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start C 0RB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LD0LG_---0LB doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start D 0LB1LA_0RC1LF_1RC1RD_1RA1LE_0LC0LE_1LE1LG_---0RE doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0RA1LF_1LC0LG_---0LA doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start B 1RA1RB_1RD1LC_0LD0LC_0LE1LD_0RA1LF_1LC0LG_---0LA doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start C 0RB1LF_1RB1RC_1RE1LD_0LE0LD_0LA1LE_1LD0LG_---0LB doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start D 0LB1LA_0RC1LF_1RC1RD_1RA1LE_0LC0LE_1LE1LG_---0RC doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start E 0LB0LA_0LC1LB_0RD1LF_1RD1RE_1RB1LA_1LA0LG_---0LD doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0RA1LF_1LC1LG_---0RA doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start C 0LB0LA_1RB1RC_1RD1LA_0LE1LD_0RB1LF_1LA1LG_---0RB doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start C 0RB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LD1LG_---0RD doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start C 0RB1LF_1RB1RC_1RE1LD_0LB0LD_0LA1LE_1LD1LG_---0RB doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start D 0LB1LA_0RC1LF_1RC1RD_1RA1LE_0LC0LE_1LE0LG_---0LC doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start B 1RA1RB_1RD1LC_0LA0LC_0LE1LD_0RA1LF_1LC1LG_---0RC doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 14 start D 0LB1LA_0RC1LF_1RC1RD_1RA1LE_0LA0LE_1LE0LG_---0LC doors [1, 7, 57] mod 2 {0: ('H',), 1: ('exp', 3, 5, 3, 3)}
+height 1 digits of first big block 10 start G 0RB1LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_---0RG_1LD0LE doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 10 start G 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0RA1LF_---0RG_1LC0LD doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 10 start G 0RB0LF_1RB1RC_1RE1LD_0LB0LD_1LA1LE_---1LA_1LD--- doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 10 start G 1LB1LA_0RC0LF_1RC1RD_1RA1LE_0LC0LE_---1LB_1LE--- doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 10 start G 1LB1LA_0RC1LF_1RC1RD_1RA1LE_0LC0LE_---0RG_1LE0LA doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 10 start G 1RA1RB_1RD1LC_0LA0LC_1LE1LD_0RA0LF_---1LE_1LC--- doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 10 start G 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0RB1LF_---0RG_1LA0LD doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 10 start G 0LB0LA_1RB1RC_1RD1LA_1LE1LD_0RB0LF_---1LE_1LA--- doors [5, 39] mod 2 {0: ('H',), 1: ('exp', 3, 12, 3, 3)}
+height 1 digits of first big block 8 start B 1RA1RB_1RE1LC_0LD0LC_0LA1LF_1LD1LE_1RF0RG_---1RB doors [2, 33] mod 3 {0: ('exp', 3, 7, 4, 9), 1: ('H',), 2: ('exp', 5, 11, 4, 9)}
+height 1 digits of first big block 8 start C 0LB1LF_1RB1RC_1RE1LD_0LA0LD_1LA1LE_1RF0RG_---1RC doors [2, 33] mod 3 {0: ('exp', 3, 7, 4, 9), 1: ('H',), 2: ('exp', 5, 11, 4, 9)}
+height 1 digits of first big block 5 start F 1LB1LA_1RC1LF_0LD0LC_1RD1RE_1RA1LC_1RG0LB_0RB--- doors [19] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}
+height 1 digits of first big block 5 start F 1RB1LF_0LC0LB_1RC1RD_1RE1LB_1LA1LE_1RG0LA_0RA--- doors [19] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}
+height 1 digits of first big block 5 start F 1RA1RB_1RD1LC_0LA0LC_1LE1LD_1RC1LF_1RG0LE_0RE--- doors [19] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}
+height 1 digits of first big block 5 start F 0LB0LA_1RB1RC_1RD1LA_1LE1LD_1RA1LF_1RG0LE_0RE--- doors [19] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}
+height 1 digits of first big block 4 start F 1LB0RB_0LC1LB_1LD1LF_1RE0LA_1RB1RD_1RG1LA_0RC--- doors [5, 18] mod 3 {0: ('exp', 3, 10, 3, 10), 1: ('H',), 2: ('exp', 5, 18, 3, 10)}
+height 1 digits of first big block 4 start F 0LB1LA_1LC1LF_1RD0LE_1RA1RC_1LA0RA_1RG1LE_0RB--- doors [5, 18] mod 3 {0: ('exp', 3, 10, 3, 10), 1: ('H',), 2: ('exp', 5, 18, 3, 10)}
+height 1 digits of first big block 4 start F 0LB0LA_1RB1RC_1RD1LA_1LE1LD_1RA1LF_1RG0LE_1LF--- doors [13] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}
+height 1 digits of first big block 4 start F 1LB1LA_1RC1LF_0LD0LC_1RD1RE_1RA1LC_1RG0LB_1LF--- doors [13] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}
+height 1 digits of first big block 4 start F 1RA1RB_1RD1LC_0LA0LC_1LE1LD_1RC1LF_1RG0LE_1LF--- doors [13] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}
+height 1 digits of first big block 4 start F 1RB0LC_1RD1RA_1LD0RD_0LE1LD_1LA1LF_1RG1LC_0RE--- doors [5, 18] mod 3 {0: ('exp', 3, 10, 3, 10), 1: ('H',), 2: ('exp', 5, 18, 3, 10)}
+height 1 digits of first big block 4 start F 1LB1LF_1RC0LD_1RE1RB_1LE0RE_0LA1LE_1RG1LD_0RA--- doors [5, 18] mod 3 {0: ('exp', 3, 10, 3, 10), 1: ('H',), 2: ('exp', 5, 18, 3, 10)}
+height 1 digits of first big block 4 start F 1RB1LF_0LC0LB_1RC1RD_1RE1LB_1LA1LE_1RG0LA_1LF--- doors [13] mod 2 {0: ('H',), 1: ('exp', 3, 16, 3, -2)}

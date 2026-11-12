@@ -3,8 +3,15 @@
 Working notes, 12 November 2026. Vishnu Vaidyanathan, with Claude.
 
 **Status: work in progress. No machine bigger than the known one has been found.**
-What we have is a method, four working parts, and one rule that explains why
-most designs fail. Everything below can be rerun from the files in this folder.
+What we have is a method, four working parts, one rule that explains why most
+designs fail, and (section 10) one designed machine that runs from a blank tape
+and is predicted to halt after about 5.5 × 10^328 steps. That is tiny next to
+the claimed champion. Everything below can be rerun from the files in this folder.
+
+**Important.** Sections 3 to 7 test parts on prepared tapes, not from a blank
+tape. A table from those sections is not a Busy Beaver machine. For example
+`1RB1LA_1RE0LC_---1LD_0LA0LB_0RF1RA_1LA1LF` stops after 9 steps from a blank
+tape. Only section 10 runs things from blank.
 
 ---
 
@@ -249,11 +256,9 @@ Not done:
       Ideas: base and modulus that do not collapse (base 2 or 5 with mod 3,
       base 3 with mod 4); fuel units of length 4; use the free seventh state
       to add classes.
-- [ ] A **boot**: the machine must start from a blank tape in state A. None of
-      the designs here has been run from a blank tape. The free seventh state
-      (2 wires) is the natural place for it.
-- [ ] An exact calculator for the class map, so each candidate's fate can be
-      worked out without running it (the towers are far too big to simulate).
+- [x] A boot from a blank tape (section 10).
+- [x] A first calculator for the class map (`src/fate.py`). It handles simple
+      maps only; 343 maps were too irregular for it.
 - [ ] Comparison with the champion. We have not worked out how many restarts
       the champion itself makes before halting.
 - [ ] Any proof. Nothing in this folder is proved in Coq.
@@ -295,7 +300,120 @@ A number is the new block size; `H` means it stopped at the empty wire named in
 
 ---
 
-## 10. Credits
+## 10. Boot: running from a blank tape
+
+Files: `src/6_boot_from_blank.c`, `src/7_long_run.c`, `src/8_doors_and_map.c`,
+`src/fate.py`, `src/verify_best.py`
+
+From here on the rule is: **a candidate counts only if it is run from a blank tape.**
+
+### The search
+
+- Take all 6,154 gate tables (`results/gate_tables_all.txt`).
+- Try each of the 7 states as the start state.
+- Allow one extra wire (28 choices) when the run reaches an empty wire.
+- An empty wire that is reached counts as a halt.
+
+| Result | Count |
+|---|---|
+| Runs tried | about 430,000 |
+| Halt before 100,000 steps (and after step 300) | 1,125, longest 45,661 steps |
+| Still running at 100,000 steps | 260,671 |
+| Of those, with an empty wire left | 101,880 |
+| Halt between 100,000 and 3,000,000 steps | 24, longest 448,484 steps |
+| Still running at 3,000,000 steps | 101,856 |
+| Of those, with a gate that can halt at all | 4,499 |
+
+### Working out the fate without running to the end
+
+For each of the 4,499 we record two things (`8_doors_and_map.c`):
+
+1. **Doors from blank**: the block sizes Q at the moments the tape is one solid
+   block with the head at the door.
+2. **The gate map**: what the gate does from the door for Q = 3 to 14.
+
+`fate.py` then fits the map (halt / small step / restart, by Q mod m) and
+follows it from the last door seen.
+
+| Predicted fate | Count |
+|---|---|
+| Runs forever in small steps | 1,481 + 1,092 |
+| Restarts forever (or more than 6 levels) | 1,427 |
+| Map too irregular to fit | 343 |
+| **Halts after one big restart** | **154** |
+
+List: `results/predicted_halters_from_blank.txt`.
+
+### A bug the direct run caught
+
+The first version of `fate.py` predicted 158 halters. We ran the 16 smallest
+in full. Twelve halted exactly as predicted (the largest after 3,632,116,441
+steps with 49,210 ones). Four did not: their gate had halted for Q = 4 only,
+and had given no answer for other even Q, and the script had read that as
+"even halts". Fixed: a class counts as "halt" only if every tested Q in it
+halts. That left 154.
+
+**Lesson.** Always run the smallest predicted cases to the end.
+
+### The best one
+
+In standard form (start state A):
+
+    1LC---_1RB1RC_1RE1LD_0LB0LD_1LF1LE_0LB1LG_---0LF
+
+(the two `---` are halt wires; only `G0` is reached). State A is used for one
+step only. The other six states are loop, fuel, gate and restart.
+
+What it does from a blank tape:
+
+| Step | Tape |
+|---|---|
+| 39 | solid block of 11 ones, at the door |
+| 177,133 | solid block of 689 ones, at the door |
+| about 5.5 × 10^328 | block of (17·3^343 + 1)/2 ones, which is even → halt |
+
+Its gate:
+
+- Q even: halts after Q − 1 more steps, leaving Q/2 + 1 ones.
+  Checked for every even Q from 4 to 200 and for 256, 1024, 2066, 4096.
+- Q odd: restart, new block = (17·3^n + 1)/2 with n = (Q − 3)/2.
+  Checked for Q = 3 to 15.
+- Steps for the restart = (867/32)·9^n − (17/2)·3^n + (17/4)·n + 109/32.
+  Fitted on five values of n, then matched two more exactly.
+- Full run from a block of 13: halts at step 1,599,883 with 1,034 ones.
+  The formulas give exactly 1,599,883 and 1,034.
+
+Predicted halting step (329 digits):
+
+    54707876372742107360416375538201134556804738790941900885463162812560
+    20390464824462986165083797230109705483114959239029815932511193440313
+    46498063467309452668560388555827379996928518037997114163468011693339
+    96414960043027674691102359828234042016866081564249513537575500690798
+    196494676879822444841073191707331145687998679996296675620
+
+Ones left on the tape: (17·3^343 + 1)/4 + 1, a 165-digit number.
+
+**What this is and is not.**
+
+- It is a machine designed from parts that runs from a blank tape, with its
+  halting time predicted from formulas.
+- It is **not proved**. The formulas are fitted to small cases and checked on a
+  few more. A Coq proof would be needed to claim it.
+- It is **not big** by today's standards. The claimed BB(7) champion is listed
+  with a bound of 3↑^20 3, and even BB(6) is known to be far beyond 10^328.
+  This machine does one big restart and stops, exactly as the collapse rule says.
+
+To check: `python3 verify_best.py` (about 5 minutes).
+
+### What the boot search tells us
+
+- The boot is not the hard part. One step of a seventh state was enough to
+  reach the door.
+- The size is decided by the gate map. Every halting design found does one big
+  restart. To get further we need a gate map with a longer path to halt
+  (section 7).
+
+## 11. Credits
 
 The BB(7) machine that started this is Jeff Ketchersid's. The method of
 reading a table as parts with jobs came out of the transcript-grammar work in

@@ -68,4 +68,6 @@ The step in `tripling_chain` is `5656 + chcost 25 12`, which is
 
 `design/` holds working notes and search code for building a BB(7) machine
 part by part (loop, fuel, gate, restart) instead of searching whole tables.
-Start with `design/README.md`. No bigger machine has been found yet.
+Start with `design/README.md`. No bigger machine has been found yet; the best
+designed machine so far is predicted to halt after about 5.5 × 10^328 steps
+(not proved, and tiny next to the claimed champion).
